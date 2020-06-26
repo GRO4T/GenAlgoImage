@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <assert.h>
+#include <cstring>
 
 const unsigned int BMP_HEADER_LENGTH = 14;
 
@@ -18,9 +20,8 @@ public:
     unsigned int size;
     unsigned int width;
     unsigned int height;
-    unsigned int rawDataSize;
+    unsigned int pixelDataOffset;
     char * data;
-
     ~Bitmap(){
         if (data != nullptr){
             delete data;
@@ -28,13 +29,12 @@ public:
     }
 };
 
-class DIBParser{
-public:
-    static void parseBITMAPINFOHEADER(Bitmap & bitmap, std::string filename);
-};
-
 class BitmapLoader{
 public:
+    ~BitmapLoader(){
+        if (buffer != nullptr) delete buffer;
+    }
+
     void load(Bitmap & bitmap, std::string filename);
     void processHeader(Bitmap & bitmap);
     void processDIBHeader(Bitmap & bitmap);
@@ -47,7 +47,7 @@ private:
     std::string filename;
     unsigned int dibHeaderLength;
 
-    DIBParser dibParser;
+    char * buffer;
 };
 
 
@@ -65,45 +65,50 @@ void BitmapLoader::load(Bitmap & bitmap, std::string filename) {
 }
 
 void BitmapLoader::processHeader(Bitmap & bitmap) {
-    char buffer[BMP_HEADER_LENGTH];
-    readBytes(this->filename, buffer, BMP_HEADER_LENGTH);
-    std::string s(&buffer[0], &buffer[BMP_HEADER_LENGTH]);
-    bitmap.size = hexConvert<unsigned int>(s.substr(2, 4));
+    char header[BMP_HEADER_LENGTH];
+    readBytes(this->filename, header, BMP_HEADER_LENGTH);
+    std::string stringBuffer(&header[0], &header[BMP_HEADER_LENGTH]);
+    bitmap.size = hexConvert<unsigned int>(stringBuffer.substr(2, 4));
+
+    this->buffer = new char[bitmap.size];
 }
 
 void BitmapLoader::processDIBHeader(Bitmap & bitmap) {
-    // read first 4 bytes of DIB header to determine its type
-    const unsigned int DIB_HEADER_OFFSET = 14;
-    char firstChar[4];
-    readBytes(this->filename, firstChar, 4, DIB_HEADER_OFFSET);
-    std::string s(&firstChar[0], &firstChar[4]);
-    dibHeaderLength = hexConvert<unsigned int>(s);
-
+    readBytes(this->filename, this->buffer, bitmap.size, 0);
+    std::string buf(&(this->buffer[BMP_HEADER_LENGTH]), &(this->buffer[BMP_HEADER_LENGTH + 4]));
+    dibHeaderLength = hexConvert<unsigned int>(buf);
+    std::cout << dibHeaderLength << std::endl;
     switch(dibHeaderLength){
-        case 40: dibParser.parseBITMAPINFOHEADER(bitmap, this->filename); break;
+        case 40: bitmap.pixelDataOffset = BMP_HEADER_LENGTH + dibHeaderLength; break;
         default: throw std::runtime_error("DIB Header not supported!");
     }
 }
 
 void BitmapLoader::processBody(Bitmap &bitmap) {
-    const unsigned int PIXEL_DATA_OFFSET = BMP_HEADER_LENGTH + dibHeaderLength;
-    char buffer[bitmap.rawDataSize];
-    readBytes(this->filename, buffer, bitmap.rawDataSize, PIXEL_DATA_OFFSET);
+    bitmap.data = new char[bitmap.size];
+    memcpy(bitmap.data, this->buffer, bitmap.size);
+
+    /*
+    const unsigned int PIXEL_DATA_SIZE = bitmap.size - bitmap.pixelDataOffset;
+    char buffer[PIXEL_DATA_SIZE];
+    readBytes(this->filename, buffer, PIXEL_DATA_SIZE, bitmap.pixelDataOffset);
 
     unsigned int byteNumber = 0;
     for (unsigned int cols = 0; cols < bitmap.width; cols++){
         for (unsigned int rows = 0; rows < bitmap.height; rows++){
-            bitmap.data[byteNumber] = buffer[byteNumber++];
-            bitmap.data[byteNumber] = buffer[byteNumber++];
-            bitmap.data[byteNumber] = buffer[byteNumber++];
+            bitmap.data[byteNumber + bitmap.pixelDataOffset] = buffer[byteNumber++];
+            bitmap.data[byteNumber + bitmap.pixelDataOffset] = buffer[byteNumber++];
+            bitmap.data[byteNumber + bitmap.pixelDataOffset] = buffer[byteNumber++];
         }
         if ((bitmap.width * 3) % 4 != 0){
             for (int i = 0; i < (bitmap.width * 3) % 4; i++){
-                bitmap.data[byteNumber++] = 0;
-                bitmap.data[byteNumber++] = 0;
+                bitmap.data[(byteNumber++) + bitmap.pixelDataOffset] = 0;
+                bitmap.data[(byteNumber++) + bitmap.pixelDataOffset] = 0;
             }
         }
-    }
+    }*/
+
+
 }
 
 void BitmapLoader::readBytes(std::string filename, char * buffer, unsigned int n, unsigned int startpos) {
@@ -132,16 +137,4 @@ T BitmapLoader::hexConvert(std::string bytes){
     return accumulator;
 }
 
-void DIBParser::parseBITMAPINFOHEADER(Bitmap &bitmap, std::string filename) {
-    const unsigned int DIB_HEADER_LENGTH = 40;
-    const unsigned int DIB_HEADER_OFFSET = 14;
-    char buffer[DIB_HEADER_LENGTH];
-    BitmapLoader::readBytes(filename, buffer, DIB_HEADER_LENGTH, DIB_HEADER_OFFSET);
-
-    std::string s(&buffer[0], &buffer[DIB_HEADER_LENGTH]);
-    bitmap.width = BitmapLoader::hexConvert<unsigned int>(s.substr(4, 4));
-    bitmap.height = BitmapLoader::hexConvert<unsigned int>(s.substr(8, 4));
-    bitmap.rawDataSize = BitmapLoader::hexConvert<unsigned int>(s.substr(20, 4));
-    bitmap.data = new char[bitmap.rawDataSize];
-}
 #endif //UNTITLED_BITMAP_LOADER_H
