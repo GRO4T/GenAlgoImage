@@ -1,44 +1,36 @@
 #include <iostream>
-#include <fstream>
 #include <sstream>
+
+#include "bitmap_loader.h"
+
+#include <SFML/Graphics.hpp>
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-    char buffer[14];
 
-    std::string filename = "../test.bmp";
-    std::ifstream bitmapFile;
-    bitmapFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    std::string filename = "../lena.bmp";
 
-    try{
-        bitmapFile.open(filename, std::ios::binary);
-        bitmapFile.read(buffer, 14);
+    BitmapLoader loader;
+    Bitmap bmp;
+    loader.load(bmp, filename);
+    sf::Image img;
+    img.loadFromMemory(bmp.data, bmp.rawDataSize);
+/*
+    sf::Texture text;
+    text.loadFromImage(img);
+
+    sf::Sprite sprite;
+    sprite.setTexture(text);
+
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ");
+
+    while (window.isOpen()){
+        window.clear();
+        window.draw(sprite);
+        window.display();
     }
-    catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening file: " << filename << " \n" << "What:\t" << e.what();
-        std::exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < 14; ++i){
-        printf("%02hhx", buffer[i]);
-    }
-
-    //convert hex to int
-    unsigned int size;
-    std::string sizeAsHex;
-    std::stringstream ss;
-    for (int i = 5; i > 1; i--){
-        sizeAsHex += buffer[i];
-    }
-    ss << std::hex << sizeAsHex;
-    std::cout << sizeAsHex;
-    size = lexical_cast<int>(sizeAsHex);
-
-    std::cout << "size: " << size << std::endl;
-
-    std::cout << std::endl;
-
+*/
     return 0;
 }
 
-void convert
+
