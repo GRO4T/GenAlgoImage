@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "bitmap_loader.h"
+#include "figures.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -11,8 +12,15 @@ int main() {
     Bitmap bmp;
     loader.load(bmp, filename);
 
-    //bmp.drawSquare(40, 40, 20, 20, *new Color(255, 255, 255));
-    bmp.clearColor(*new Color(255, 255, 255));
+    Square sq;
+    for (int i = 0; i < 5; i++){
+        sq.randomize(*new Square(0, 0, 512, 512));
+        std::cout << "posx: " << sq.posx << std::endl;
+        std::cout << "posy: " << sq.posy << std::endl;
+        std::cout << "width: " << sq.width << std::endl;
+        std::cout << "height: " << sq.height << std::endl;
+        bmp.drawSquare(sq, *new Color());
+    }
 
     sf::Image img;
     img.loadFromMemory(bmp.data, bmp.size);
