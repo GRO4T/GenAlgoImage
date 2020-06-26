@@ -6,10 +6,13 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
-    std::string filename = "../lena.bmp";
+    std::string filename = "../res/lena.bmp";
     BitmapLoader loader;
     Bitmap bmp;
     loader.load(bmp, filename);
+
+    //bmp.drawSquare(40, 40, 20, 20, *new Color(255, 255, 255));
+    bmp.clearColor(*new Color(255, 255, 255));
 
     sf::Image img;
     img.loadFromMemory(bmp.data, bmp.size);
@@ -35,6 +38,8 @@ int main() {
                 window.close();
         }
     }
+
+    loader.save(bmp, "../res/test.bmp");
     return 0;
 }
 
