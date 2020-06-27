@@ -11,15 +11,24 @@
 class SFMLImage : public Image{
     friend class SFMLImageLoader;
 public:
+    void create(unsigned int width, unsigned int height, Color imageColor) override ;
+
     void drawPixel(int x, int y, Color color) override;
     Color getPixelColor(int x, int y) override;
     unsigned int getWidth() const override;
     unsigned int getHeight() const override;
 
     sf::Image& getImage() { return data; }
+
+    void loadToSFImage(sf::Image &img) override;
+
 private:
     sf::Image data;
 };
+
+void SFMLImage::create(unsigned int width, unsigned int height, Color imageColor) {
+    data.create(width, height, sf::Color(imageColor.red, imageColor.green, imageColor.blue));
+}
 
 void SFMLImage::drawPixel(int x, int y, Color color) {
     data.setPixel(x, y, sf::Color(color.red, color.green, color.blue));
@@ -36,6 +45,10 @@ unsigned int SFMLImage::getWidth() const {
 
 unsigned int SFMLImage::getHeight() const {
     return data.getSize().y;
+}
+
+void SFMLImage::loadToSFImage(sf::Image &img) {
+    img = data;
 }
 
 class SFMLImageLoader : public ImageLoader{
@@ -56,5 +69,6 @@ public:
 private:
     std::string filename;
 };
+
 
 #endif //UNTITLED_SFML_IMAGE_H

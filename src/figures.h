@@ -10,6 +10,8 @@
 #include <iostream>
 #include <algorithm>
 
+#define MIN_CIRCLE_RADIUS 10.0f
+
 class Color{
 public:
     uint8_t red;
@@ -26,6 +28,8 @@ public:
     void setNoColor(bool noColor) {
         Color::noColor = noColor;
     }
+
+    Color diff(Color color);
 
     // overloaded operators
     friend std::ostream& operator<<(std::ostream& os, const Color &color);
@@ -47,14 +51,21 @@ Color Color::operator+(const Color &color) {
     int red = std::max(0, std::min((int)(this->red + color.red), 255));
     int green = std::max(0, std::min((int)(this->green + color.green), 255));
     int blue = std::max(0, std::min((int)(this->blue + color.blue), 255));
-    return Color(red, blue, green);
+    return Color(red, green, blue);
 }
 
 Color Color::operator-(const Color &color) {
     int red = std::max(0, std::min((int)(this->red - color.red), 255));
     int green = std::max(0, std::min((int)(this->green - color.green), 255));
     int blue = std::max(0, std::min((int)(this->blue - color.blue), 255));
-    return Color(red, blue, green);
+    return Color(red, green, blue);
+}
+
+Color Color::diff(Color color) {
+    int red = std::abs((int)(this->red - color.red));
+    int green = std::abs((int)(this->green - color.green));
+    int blue = std::abs((int)(this->blue - color.blue));
+    return Color(red, green, blue);
 }
 
 class Square{
@@ -84,6 +95,14 @@ public:
 
     Circle(int x, int y, double radius) : x(x), y(y), radius(radius) {}
     Circle() {}
+    void randomize(Square bounds);
 };
+
+void Circle::randomize(Square bounds) {
+    this->x = rand() % bounds.width + bounds.x;
+    this->y = rand() % bounds.height + bounds.y;
+    int maxRadius = std::max(bounds.width, bounds.height);
+    this->radius = rand() % maxRadius + MIN_CIRCLE_RADIUS;
+}
 
 #endif //UNTITLED_FIGURES_H

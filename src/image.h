@@ -5,10 +5,13 @@
 #ifndef UNTITLED_IMAGE_H
 #define UNTITLED_IMAGE_H
 
+#include <SFML/Graphics/Image.hpp>
 #include "figures.h"
 
 class Image{
 public:
+    virtual void create(unsigned int width, unsigned int height, Color imageColor) = 0;
+
     virtual bool isPointInBounds(int x, int y) { return (x >= 0 && x < getWidth()) && (y >= 0 && y < getHeight()); }
 
     virtual void drawPixel(int x, int y, Color color) = 0;
@@ -22,6 +25,8 @@ public:
     virtual void drawSquare(Square square, Color color);
     virtual void drawCircle(int posx, int posy, double radius, Color color);
     virtual void drawCircle(Circle circle, Color color);
+
+    virtual void loadToSFImage(sf::Image& img) = 0;
 };
 
 void Image::clearColor(Color color) {

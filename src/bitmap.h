@@ -33,10 +33,17 @@ public:
         }
     }
 
+    void create(unsigned int width, unsigned int height, Color imageColor) override {
+        throw std::runtime_error("bitmap: create not implemented!");
+    }
+
     unsigned int getWidth() const override ;
     unsigned int getHeight() const override ;
     void drawPixel(int x, int y, Color color) override ;
     Color getPixelColor(int x, int y) override ;
+
+    void loadToSFImage(sf::Image &img) override;
+
 private:
     unsigned int width;
     unsigned int paddedWidth;
@@ -86,6 +93,10 @@ void Bitmap::setHeight(unsigned int height) {
     Bitmap::height = height;
 }
 
+void Bitmap::loadToSFImage(sf::Image &img) {
+    img.loadFromMemory(data, size);
+}
+
 /* <BitmapLoader> */
 
 class BitmapLoader : public ImageLoader{
@@ -114,6 +125,7 @@ private:
     // DIB headers
     void parseBITMAPINFOHEADER(Bitmap & bitmap);
 };
+
 
 void BitmapLoader::load(Image& image, std::string filename) {
     this->filename = filename;
