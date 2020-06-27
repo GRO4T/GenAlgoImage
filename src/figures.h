@@ -7,37 +7,83 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <iostream>
+#include <algorithm>
 
 class Color{
 public:
-    Color(uint8_t red, uint8_t green, uint8_t blue) : red(red), green(green), blue(blue) {}
-    Color() { red = rand() % 256; green = rand() % 256; blue = rand() % 256; }
     uint8_t red;
     uint8_t green;
     uint8_t blue;
+
+    Color(uint8_t red, uint8_t green, uint8_t blue) : red(red), green(green), blue(blue) {}
+    Color() { red = rand() % 256; green = rand() % 256; blue = rand() % 256; }
+
+    bool isNoColor() const {
+        return noColor;
+    }
+
+    void setNoColor(bool noColor) {
+        Color::noColor = noColor;
+    }
+
+    // overloaded operators
+    friend std::ostream& operator<<(std::ostream& os, const Color &color);
+    Color operator+(const Color& color);
+    Color operator-(const Color& color);
+private:
+    bool noColor = false;
 };
+
+std::ostream &operator<<(std::ostream &os, const Color &color) {
+    os << "(R, G, B) = (" << (unsigned int)color.red << ", " <<
+       (unsigned int)color.green << ", " <<
+       (unsigned int)color.blue << ")";
+
+    return os;
+}
+
+Color Color::operator+(const Color &color) {
+    int red = std::max(0, std::min((int)(this->red + color.red), 255));
+    int green = std::max(0, std::min((int)(this->green + color.green), 255));
+    int blue = std::max(0, std::min((int)(this->blue + color.blue), 255));
+    return Color(red, blue, green);
+}
+
+Color Color::operator-(const Color &color) {
+    int red = std::max(0, std::min((int)(this->red - color.red), 255));
+    int green = std::max(0, std::min((int)(this->green - color.green), 255));
+    int blue = std::max(0, std::min((int)(this->blue - color.blue), 255));
+    return Color(red, blue, green);
+}
 
 class Square{
 public:
-    int posx;
-    int posy;
+    int x;
+    int y;
     int width;
     int height;
 
-    Square(int posx, int posy, int width, int height) : posx(posx), posy(posy), width(width), height(height) {}
+    Square(int posx, int posy, int width, int height) : x(posx), y(posy), width(width), height(height) {}
     Square() {}
     void randomize(Square bounds);
 };
 
-class Circle{
-
-};
-
 void Square::randomize(Square bounds) {
-    this->posx = rand() % bounds.width + bounds.posx;
-    this->posy = rand() % bounds.height + bounds.posy;
-    this->width = rand() % (bounds.width - this->posx);
-    this->height = rand() % (bounds.height - this->posy);
+    this->x = rand() % bounds.width + bounds.x;
+    this->y = rand() % bounds.height + bounds.y;
+    this->width = rand() % (bounds.width - this->x);
+    this->height = rand() % (bounds.height - this->y);
 }
+
+class Circle{
+public:
+    int x;
+    int y;
+    double radius;
+
+    Circle(int x, int y, double radius) : x(x), y(y), radius(radius) {}
+    Circle() {}
+};
 
 #endif //UNTITLED_FIGURES_H
