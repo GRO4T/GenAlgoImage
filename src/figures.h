@@ -29,6 +29,10 @@ public:
     void randomize(Square bounds);
 };
 
+class Circle{
+
+};
+
 void Square::randomize(Square bounds) {
     this->posx = rand() % bounds.width + bounds.posx;
     this->posy = rand() % bounds.height + bounds.posy;

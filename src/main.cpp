@@ -20,6 +20,7 @@ int main() {
         std::cout << "width: " << sq.width << std::endl;
         std::cout << "height: " << sq.height << std::endl;
         bmp.drawSquare(sq, *new Color());
+        //bmp.drawCircle(sq.posx, sq.posy, 10.0f, *new Color());
     }
 
     sf::Image img;

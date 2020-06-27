@@ -6,10 +6,11 @@
 #define UNTITLED_BITMAP_H
 
 #include "figures.h"
+#include "image.h"
 
 const unsigned int BMP_HEADER_LENGTH = 14;
 
-class Bitmap{
+class Bitmap : public Image{
 public:
     unsigned int size;
     unsigned int pixelDataOffset;
@@ -26,13 +27,11 @@ public:
     unsigned int getHeight() const;
     void setHeight(unsigned int height);
 
-    Color getPixelColor(int posx, int posy);
+    Color getPixelColor(int x, int y) override;
 
-    void clearColor(Color color);
-    void drawPixel(int x, int y, Color color);
-    void drawSquare(int posx, int posy, int width, int height, Color color);
-    void drawSquare(Square square, Color color);
-    //void drawCircle(int posx, int posy, int radius, Color color);
+    void clearColor(Color color) override;
+    void drawPixel(int x, int y, Color color) override;
+    void drawCircle(unsigned int posx, unsigned int posy, double radius, Color color);
 private:
     unsigned int width;
     unsigned int paddedWidth;
@@ -48,16 +47,8 @@ void Bitmap::drawPixel(int x, int y, Color color) {
     data[byteNumber + 2] = color.blue;
 }
 
-void Bitmap::drawSquare(int posx, int posy, int width, int height, Color color) {
-    for (int y = posy; y < posy + height; y++){
-        for (int x = posx; x < posx + width; x++){
-            drawPixel(x, y, color);
-        }
-    }
-}
-
-void Bitmap::drawSquare(Square square, Color color) {
-    drawSquare(square.posx, square.posy, square.width, square.height, color);
+Color Bitmap::getPixelColor(int x, int y) {
+    return *new Color();
 }
 
 unsigned int Bitmap::getWidth() const {
@@ -78,7 +69,22 @@ void Bitmap::setHeight(unsigned int height) {
 }
 
 void Bitmap::clearColor(Color color) {
-    drawSquare(0, 0, width, height, color);
+    Image::drawSquare(0, 0, width, height, color);
+}
+
+void Bitmap::drawCircle(unsigned int posx, unsigned int posy, double radius, Color color) {
+    if (radius < 0.0f)
+        return;
+    for (int y = posy - radius; y < posy + radius; y++){
+        for (int x = posx - radius; x < posx + radius; x++){
+            if ((x >= 0 && x < width) && (y >= 0 && y < height)){
+                int dx = x - posx;
+                int dy = y - posy;
+                if (sqrt((double)(dx * dx + dy * dy)) < radius)
+                    drawPixel(x, y, color);
+            }
+        }
+    }
 }
 
 #endif //UNTITLED_BITMAP_H

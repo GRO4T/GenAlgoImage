@@ -5,6 +5,7 @@
 #ifndef UNTITLED_GENETIC_ALGORITHM_H
 #define UNTITLED_GENETIC_ALGORITHM_H
 
+#define MIN_CIRCLE_RADIUS 10.0f
 
 class GeneticAlgorithm{
 };
@@ -17,7 +18,7 @@ public:
 
 };
 
-class SquareIndividual : Individual{
+class CircleIndividual : Individual{
 public:
     float
 };
