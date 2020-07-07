@@ -4,6 +4,11 @@
 #include "genetic_algorithm.h"
 
 #include <SFML/Graphics.hpp>
+#include <thread>
+#include <atomic>
+
+std::atomic<bool> ready = false;
+sf::Image img;
 
 void testBitmap(sf::Image& img, std::string filename);
 void testSFMLImage(sf::Image& img, std::string filename);
@@ -13,12 +18,27 @@ void testcpp17();
 void testColor();
 
 
+void doStuff(SFMLImage& original){
+    GeneticAlgorithm<SFMLImage> geneticAlgorithm(0, 4,original);
+    geneticAlgorithm.createPopulation(50);
+    Individual<SFMLImage> best;
+    for (int i = 0; i < 3; i++){
+        std::cout << "i: " << i << std::endl << std::endl;
+        geneticAlgorithm.nextGeneration();
+        geneticAlgorithm.displayBestIndividual();
+        best = geneticAlgorithm.getBestIndividual();
+        best.loadResultToSFImage(img);
+        ready = true;
+        while (ready);
+    }
+}
+
+
 int main() {
     srand (time(NULL));
 
     std::string bmpFilename = "../res/lena.bmp";
     std::string sfmlImageFilename = "../res/lena.png";
-    sf::Image img;
 
     SFMLImage original;
     SFMLImageLoader loader;
@@ -28,25 +48,33 @@ int main() {
     //testBitmap(img, bmpFilename);
     //testSFMLImage(img, sfmlImageFilename);
     //testcpp17();
-    testColor();
+    //testColor();
 
 
     //Individual<SFMLImage> i(2, 2, Square(0, 0, 512, 512));
-    Individual<SFMLImage> i(0, 0, Square(0, 0, 512, 512));
-    i.randomize();
-    i.loadResultToSFImage(img);
-    std::cout << "score: " << i.evaluate(original) << std::endl;
+    //Individual<SFMLImage> i(0, 3, Square(0, 0, 512, 512));
+    //i.randomize();
+    //i.loadResultToSFImage(img);
+    //std::cout << "score: " << i.evaluate(original) << std::endl;
+
+
+    //geneticAlgorithm.saveResultsToFiles("../res/test/test");
 
     sf::Texture text;
-    text.loadFromImage(img);
-
     sf::Sprite sprite;
-    sprite.setTexture(text);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ");
     window.setFramerateLimit(30);
 
+    std::thread first(doStuff, original);
+
+
     while (window.isOpen()){
+        if (ready){
+            text.loadFromImage(img);
+            sprite.setTexture(text);
+            ready = false;
+        }
         window.clear();
         window.draw(sprite);
         window.display();
@@ -59,6 +87,7 @@ int main() {
         }
     }
 
+    first.join();
     return 0;
 }
 

@@ -72,3 +72,4 @@ fabric.properties
 
 # Custom project ignore
 lib/
+res/

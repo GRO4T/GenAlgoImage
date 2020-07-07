@@ -27,6 +27,8 @@ public:
     virtual void drawCircle(Circle circle, Color color);
 
     virtual void loadToSFImage(sf::Image& img) = 0;
+
+    virtual Square getImageBounds();
 };
 
 void Image::clearColor(Color color) {
@@ -69,6 +71,10 @@ public:
     virtual void load(Image & image, std::string filename) = 0;
     virtual void save(Image & image, std::string filename = "") = 0;
 };
+
+Square Image::getImageBounds() {
+    return Square(0, 0, getWidth(), getHeight());
+}
 
 
 #endif //UNTITLED_IMAGE_H
