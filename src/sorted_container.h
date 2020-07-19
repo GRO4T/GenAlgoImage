@@ -10,25 +10,15 @@
 template<class T>
 class SortedContainer{
 public:
-    SortedContainer(unsigned int size){
-        container.reserve(size);
-    }
-
-    SortedContainer(){}
-
-    void add(T& value){
+    void add(T value){
         container.push_back(value);
     }
     T& get(int i){
-        return container.at(i);
-    }
-
-    void sort(){
-        std::sort(container.begin(), container.end());
+        return container[i];
     }
 
     void remove(int i){
-        container.erase(container.begin() + i);
+        container.erase(i);
     }
 private:
     std::vector<T> container;

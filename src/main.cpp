@@ -1,11 +1,12 @@
 #include "figures.h"
-#include "bitmap.h"
-#include "sfml_image.h"
+#include "image/bitmap.h"
+#include "image/sfml_image.h"
 #include "genetic_algorithm.h"
 
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <atomic>
+#include <memory>
 
 std::atomic<bool> ready = false;
 sf::Image img;
@@ -18,17 +19,32 @@ void testcpp17();
 void testColor();
 
 
-void doStuff(SFMLImage& original){
-    GeneticAlgorithm<SFMLImage> geneticAlgorithm(0, 4,original);
+void doStuff(Bitmap* original){
+    GeneticAlgorithm<Bitmap> geneticAlgorithm(0,  50,original);
     geneticAlgorithm.createPopulation(50);
-    Individual<SFMLImage> best;
-    for (int i = 0; i < 3; i++){
-        std::cout << "i: " << i << std::endl << std::endl;
+    Individual<Bitmap> * best;
+    for (int i = 0; i < 20; i++){
         geneticAlgorithm.nextGeneration();
-        geneticAlgorithm.displayBestIndividual();
+        geneticAlgorithm.displayBestIndividual(5);
         best = geneticAlgorithm.getBestIndividual();
-        best.loadResultToSFImage(img);
+        best->loadResultToSFImage(img);
         ready = true;
+
+        while (ready);
+    }
+}
+
+void doStuff2(SFMLImage* original){
+    GeneticAlgorithm<SFMLImage> geneticAlgorithm(0,  50,original);
+    geneticAlgorithm.createPopulation(50);
+    Individual<SFMLImage> * best;
+    for (int i = 0; i < 20; i++){
+        geneticAlgorithm.nextGeneration();
+        geneticAlgorithm.displayBestIndividual(5);
+        best = geneticAlgorithm.getBestIndividual();
+        best->loadResultToSFImage(img);
+        ready = true;
+
         while (ready);
     }
 }
@@ -40,16 +56,19 @@ int main() {
     std::string bmpFilename = "../res/lena.bmp";
     std::string sfmlImageFilename = "../res/lena.png";
 
-    SFMLImage original;
-    SFMLImageLoader loader;
-    loader.load(original, sfmlImageFilename);
+    SFMLImage original2;
+    SFMLImageLoader loader2;
+    loader2.load(original2, sfmlImageFilename);
+
+    BitmapLoader loader;
+    Bitmap original;
+    loader.load(original, bmpFilename);
     //original.create(512, 512, Color(0, 0, 0));
 
-    //testBitmap(img, bmpFilename);
+    testBitmap(img, bmpFilename);
     //testSFMLImage(img, sfmlImageFilename);
     //testcpp17();
     //testColor();
-
 
     //Individual<SFMLImage> i(2, 2, Square(0, 0, 512, 512));
     //Individual<SFMLImage> i(0, 3, Square(0, 0, 512, 512));
@@ -66,7 +85,8 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ");
     window.setFramerateLimit(30);
 
-    std::thread first(doStuff, original);
+    //std::thread first(doStuff, &original);
+    std::thread first(doStuff2, &original2);
 
 
     while (window.isOpen()){
@@ -95,6 +115,13 @@ void testBitmap(sf::Image& img, std::string filename){
     BitmapLoader loader;
     Bitmap bmp;
     loader.load(bmp, filename);
+
+    Timeit stoper;
+    stoper.start();
+    bmp.clearColor(Color(255, 255, 255));
+    stoper.stop();
+    std::cout << "lena bmp clear ";
+    stoper.time();
 
     Square sq;
     for (int i = 0; i < 5; i++){

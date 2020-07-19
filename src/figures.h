@@ -10,7 +10,8 @@
 #include <iostream>
 #include <algorithm>
 
-#define MIN_CIRCLE_RADIUS 10.0f
+#define MIN_CIRCLE_RADIUS 10
+#define MAX_CIRCLE_RADIUS 70
 
 class Color{
 public:
@@ -101,8 +102,23 @@ public:
 void Circle::randomize(Square bounds) {
     this->x = rand() % bounds.width + bounds.x;
     this->y = rand() % bounds.height + bounds.y;
-    int maxRadius = std::max(bounds.width, bounds.height);
-    this->radius = rand() % maxRadius + MIN_CIRCLE_RADIUS;
+    this->radius = rand() % MAX_CIRCLE_RADIUS + MIN_CIRCLE_RADIUS;
 }
+
+class ColoredSquare{
+public:
+    ColoredSquare(const Square &square, const Color &color) : square(square), color(color) {}
+    ColoredSquare(Square bounds) { square.randomize(bounds); color = Color(); }
+    Square square;
+    Color color;
+};
+
+class ColoredCircle{
+public:
+    ColoredCircle(const Circle &circle, const Color &color) : circle(circle), color(color) {}
+    ColoredCircle(Square bounds) { circle.randomize(bounds); color = Color(); }
+    Circle circle;
+    Color color;
+};
 
 #endif //UNTITLED_FIGURES_H

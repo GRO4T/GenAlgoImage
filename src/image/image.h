@@ -6,7 +6,7 @@
 #define UNTITLED_IMAGE_H
 
 #include <SFML/Graphics/Image.hpp>
-#include "figures.h"
+#include "../figures.h"
 
 class Image{
 public:
