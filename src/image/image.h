@@ -7,73 +7,74 @@
 
 #include <SFML/Graphics/Image.hpp>
 #include "../figures.h"
+namespace gen_algo_image{
+    class Image{
+    public:
+        virtual void Create(unsigned int width, unsigned int height, Color imageColor) = 0;
 
-class Image{
-public:
-    virtual void create(unsigned int width, unsigned int height, Color imageColor) = 0;
+        virtual bool IsPointInBounds(int x, int y) { return (x >= 0 && x < GetWidth()) && (y >= 0 && y < GetHeight()); }
 
-    virtual bool isPointInBounds(int x, int y) { return (x >= 0 && x < getWidth()) && (y >= 0 && y < getHeight()); }
+        virtual void DrawPixel(int x, int y, Color color) = 0;
+        virtual Color GetPixelColor(int x, int y) = 0;
 
-    virtual void drawPixel(int x, int y, Color color) = 0;
-    virtual Color getPixelColor(int x, int y) = 0;
+        virtual unsigned int GetWidth() const = 0;
+        virtual unsigned int GetHeight() const = 0;
 
-    virtual unsigned int getWidth() const = 0;
-    virtual unsigned int getHeight() const = 0;
+        virtual void ClearColor(Color color);
+        virtual void DrawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color);
+        virtual void DrawSquare(Square square, Color color);
+        virtual void DrawCircle(int posx, int posy, int radius, Color color);
+        virtual void DrawCircle(Circle circle, Color color);
 
-    virtual void clearColor(Color color);
-    virtual void drawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color);
-    virtual void drawSquare(Square square, Color color);
-    virtual void drawCircle(int posx, int posy, double radius, Color color);
-    virtual void drawCircle(Circle circle, Color color);
+        virtual void LoadToSFImage(sf::Image& img) = 0;
 
-    virtual void loadToSFImage(sf::Image& img) = 0;
+        virtual Square GetImageBounds();
+    };
 
-    virtual Square getImageBounds();
-};
-
-void Image::clearColor(Color color) {
-    drawSquare(0, 0, getWidth(), getHeight(), color);
-}
-
-void Image::drawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color) {
-    for (int y = posy; y < posy + height; y++){
-        for (int x = posx; x < posx + width; x++){
-            drawPixel(x, y, color);
-        }
+    void Image::ClearColor(Color color) {
+        DrawSquare(0, 0, GetWidth(), GetHeight(), color);
     }
-}
 
-void Image::drawSquare(Square square, Color color) {
-    drawSquare(square.x, square.y, square.width, square.height, color);
-}
-
-void Image::drawCircle(int posx, int posy, double radius, Color color) {
-    if (radius < 0.0f)
-        return;
-    for (int y = posy - radius; y < posy + radius; y++){
-        for (int x = posx - radius; x < posx + radius; x++){
-            if (isPointInBounds(x, y)){
-                int dx = x - posx;
-                int dy = y - posy;
-                if (sqrt((double)(dx * dx + dy * dy)) < radius)
-                    drawPixel(x, y, color);
+    void Image::DrawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color) {
+        for (int y = posy; y < posy + height; y++){
+            for (int x = posx; x < posx + width; x++){
+                DrawPixel(x, y, color);
             }
         }
     }
-}
 
-void Image::drawCircle(Circle circle, Color color) {
-    drawCircle(circle.x, circle.y, circle.radius, color);
-}
+    void Image::DrawSquare(Square square, Color color) {
+        DrawSquare(square.x, square.y, square.width, square.height, color);
+    }
 
-class ImageLoader{
-public:
-    virtual void load(Image & image, std::string filename) = 0;
-    virtual void save(Image & image, std::string filename = "") = 0;
-};
+    void Image::DrawCircle(int posx, int posy, int radius, Color color) {
+        if (radius < 0.0f)
+            return;
+        for (int y = posy - radius; y < posy + radius; y++){
+            for (int x = posx - radius; x < posx + radius; x++){
+                if (IsPointInBounds(x, y)){
+                    int dx = x - posx;
+                    int dy = y - posy;
+                    if (dx * dx + dy * dy < radius * radius)
+                        DrawPixel(x, y, color);
+                }
+            }
+        }
+    }
 
-Square Image::getImageBounds() {
-    return Square(0, 0, getWidth(), getHeight());
+    void Image::DrawCircle(Circle circle, Color color) {
+        DrawCircle(circle.x, circle.y, circle.radius, color);
+    }
+
+    class ImageLoader{
+    public:
+        virtual void Load(Image & image, std::string filename) = 0;
+        virtual void Save(Image & image, std::string filename = "") = 0;
+    };
+
+    Square Image::GetImageBounds() {
+        return Square(0, 0, GetWidth(), GetHeight());
+    }
 }
 
 

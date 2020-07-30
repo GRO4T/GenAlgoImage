@@ -15,109 +15,88 @@
 #include "individual.h"
 #include "sorted_container.h"
 
-template<class ImageType>
-class GeneticAlgorithm{
-    static_assert(std::is_base_of<Image, ImageType>::value, "ImageType must inherit from Image");
-public:
-    GeneticAlgorithm(unsigned int numSquares, unsigned int numCircles, ImageType* originalImage);
-    void createPopulation(int size);
-    void nextGeneration();
-    void displayBestIndividual(unsigned int n = 0);
-    void saveResultsToFiles(std::string filePrefix);
+namespace gen_algo_image{
+    template<class ImageType>
+    class GeneticAlgorithm{
+        static_assert(std::is_base_of<Image, ImageType>::value, "ImageType must inherit from Image");
+    public:
+        GeneticAlgorithm(unsigned int numSquares, unsigned int numCircles, ImageType* originalImage);
+        void CreatePopulation(int size);
+        void NextGeneration();
 
-    Individual<ImageType>* getBestIndividual(){
-        //population.sort();
-        return &population.get(populationSize - 1);
-    }
-private:
-    SortedContainer<Individual<ImageType>> population;
-    //std::vector<Individual<ImageType>> population;
+        Individual<ImageType> GetBestIndividual(){
+            return bestIndividual;
+        }
+    private:
+        SortedContainer<Individual<ImageType>> population;
+        //std::vector<Individual<ImageType>> population;
 
-    unsigned int populationSize;
-    unsigned int numSquares;
-    unsigned int numCircles;
-    ImageType* originalImage;
-};
+        unsigned int populationSize;
+        unsigned int numSquares;
+        unsigned int numCircles;
+        ImageType* originalImage;
 
-template<class ImageType>
-void GeneticAlgorithm<ImageType>::createPopulation(int size) {
-    Timeit stoper;
+        Individual<ImageType> bestIndividual;
+    };
 
-    this->populationSize = size;
-    for (int i = 0; i < size; i++){
-        Individual<ImageType> individual(numSquares, numCircles, originalImage->getImageBounds());
-        individual.randomize();
-
-        stoper.start();
-        individual.applyFiguresToResult();
-        stoper.stop();
-        //population.push_back(individual);
-        population.add(individual);
-
-        std::cout << "apply figures " << i << " ";
-        stoper.time();
-    }
-}
-
-template<class ImageType>
-void GeneticAlgorithm<ImageType>::displayBestIndividual(unsigned int n) {
-    if (n == 0) n = populationSize;
-    int lastId = populationSize - n - 1;
-    //population.sort();
-    for (int i = populationSize - 1; i > lastId; i--){
-        std::cout << "score: " << population.get(i).getScore() << std::endl;
-    }
-}
-
-template<class ImageType>
-void GeneticAlgorithm<ImageType>::nextGeneration() {
-    Timeit stoper;
-
-    //population.sort();
-    for (int i = populationSize - 1; i >= 0; i--){
-        Individual<ImageType>* individual = &population.get(i);
-        stoper.start();
-        individual->clear();
-        stoper.stop();
-
-        std::cout << "clear ";
-        stoper.time();
-
-        stoper.start();
-        individual->randomize();
-        stoper.stop();
-
-        std::cout << "randomize ";
-        stoper.time();
-
-        stoper.start();
-        individual->applyFiguresToResult();
-        stoper.stop();
-
-        std::cout << "apply ";
-        stoper.time();
+    template<class ImageType>
+    void GeneticAlgorithm<ImageType>::CreatePopulation(int size) {
+        this->populationSize = size;
+        for (int i = 0; i < size; i++){
+            Individual<ImageType> individual(numSquares, numCircles, originalImage->GetImageBounds());
+            individual.Randomize();
+            individual.ApplyFiguresToResult();
+            population.Add(individual);
+        }
     }
 
-    stoper.start();
-    for (int i = 0; i < populationSize; i++){
-        Individual<ImageType>* ind = &population.get(i);
-        ind->evaluate(*originalImage);
-    }
-    stoper.stop();
-    std::cout << "evaluate ";
-    stoper.time();
-}
+    template<class ImageType>
+    void GeneticAlgorithm<ImageType>::NextGeneration() {
+        Timeit stoper;
 
-template<class ImageType>
-GeneticAlgorithm<ImageType>::GeneticAlgorithm(unsigned int numSquares, unsigned int numCircles,
-                                              ImageType* originalImage):numSquares(numSquares), numCircles(numCircles),
-                                                                        originalImage(originalImage) {}
+        for (int i = 0; i < populationSize; i++){
+            Individual<ImageType>* individual = &population.Get(i);
+            stoper.Start();
+            individual->Clear();
+            stoper.Stop();
 
-template<class ImageType>
-void GeneticAlgorithm<ImageType>::saveResultsToFiles(std::string filePrefix) {
-    for (int i = 0; i < populationSize; i++){
-        population.get(i).saveResultToFile(filePrefix + std::to_string(i) + ".png");
+            std::cout << "clear ";
+            stoper.Time();
+
+            stoper.Start();
+            individual->Randomize();
+            stoper.Stop();
+
+            std::cout << "randomize ";
+            stoper.Time();
+
+            stoper.Start();
+            individual->ApplyFiguresToResult();
+            stoper.Stop();
+
+            std::cout << "apply ";
+            stoper.Time();
+
+            stoper.Start();
+            individual->Evaluate(*originalImage);
+            stoper.Stop();
+            std::cout << "evaluate ";
+            stoper.Time();
+        }
+        population.Sort();
+        bestIndividual = population.Get(0);
+
+        // display scores
+        for (int i = 0; i < 5; i++){
+            std::cout << "score : " << population.Get(i).GetScore() << std::endl;
+        }
     }
+
+    template<class ImageType>
+    GeneticAlgorithm<ImageType>::GeneticAlgorithm(unsigned int numSquares, unsigned int numCircles,
+                                                  ImageType* originalImage)
+                                                  : numSquares(numSquares), numCircles(numCircles),
+                                                  originalImage(originalImage) {}
 }
 
 #endif //UNTITLED_GENETIC_ALGORITHM_H

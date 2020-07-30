@@ -1,33 +1,37 @@
 #include "figures.h"
 #include "image/bitmap.h"
 #include "image/sfml_image.h"
+#include "image/arash_partow_bitmap.h"
 #include "genetic_algorithm.h"
+
 
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <atomic>
 #include <memory>
 
+using gen_algo_image::Bitmap;
+using gen_algo_image::BitmapLoader;
+using gen_algo_image::SFMLImage;
+using gen_algo_image::SFMLImageLoader;
+using gen_algo_image::GeneticAlgorithm;
+using gen_algo_image::Individual;
+using gen_algo_image::Color;
+using gen_algo_image::Square;
+using gen_algo_image::Circle;
+using gen_algo_image::Timeit;
+
 std::atomic<bool> ready = false;
 sf::Image img;
 
-void testBitmap(sf::Image& img, std::string filename);
-void testSFMLImage(sf::Image& img, std::string filename);
-
-void testcpp17();
-
-void testColor();
-
-
 void doStuff(Bitmap* original){
     GeneticAlgorithm<Bitmap> geneticAlgorithm(0,  50,original);
-    geneticAlgorithm.createPopulation(50);
-    Individual<Bitmap> * best;
+    geneticAlgorithm.CreatePopulation(50);
+    Individual<Bitmap> best;
     for (int i = 0; i < 20; i++){
-        geneticAlgorithm.nextGeneration();
-        geneticAlgorithm.displayBestIndividual(5);
-        best = geneticAlgorithm.getBestIndividual();
-        best->loadResultToSFImage(img);
+        geneticAlgorithm.NextGeneration();
+        best = geneticAlgorithm.GetBestIndividual();
+        best.LoadResultToSFImage(img);
         ready = true;
 
         while (ready);
@@ -36,21 +40,28 @@ void doStuff(Bitmap* original){
 
 void doStuff2(SFMLImage* original){
     GeneticAlgorithm<SFMLImage> geneticAlgorithm(0,  50,original);
-    geneticAlgorithm.createPopulation(50);
-    Individual<SFMLImage> * best;
+    geneticAlgorithm.CreatePopulation(50);
+    Individual<SFMLImage> best;
     for (int i = 0; i < 20; i++){
-        geneticAlgorithm.nextGeneration();
-        geneticAlgorithm.displayBestIndividual(5);
-        best = geneticAlgorithm.getBestIndividual();
-        best->loadResultToSFImage(img);
+        geneticAlgorithm.NextGeneration();
+        best = geneticAlgorithm.GetBestIndividual();
+        best.LoadResultToSFImage(img);
         ready = true;
 
         while (ready);
     }
 }
 
+/* Junk, no need to refactor */
+void testBitmap(sf::Image& img, std::string filename);
+void testSFMLImage(sf::Image& img, std::string filename);
+void testcpp17();
+void testColor();
+void TestBitmapImage();
 
 int main() {
+    TestBitmapImage();
+/*
     srand (time(NULL));
 
     std::string bmpFilename = "../res/lena.bmp";
@@ -58,11 +69,11 @@ int main() {
 
     SFMLImage original2;
     SFMLImageLoader loader2;
-    loader2.load(original2, sfmlImageFilename);
+    loader2.Load(original2, sfmlImageFilename);
 
     BitmapLoader loader;
     Bitmap original;
-    loader.load(original, bmpFilename);
+    loader.Load(original, bmpFilename);
     //original.create(512, 512, Color(0, 0, 0));
 
     testBitmap(img, bmpFilename);
@@ -78,6 +89,7 @@ int main() {
 
 
     //geneticAlgorithm.saveResultsToFiles("../res/test/test");
+    */
 
     sf::Texture text;
     sf::Sprite sprite;
@@ -86,10 +98,12 @@ int main() {
     window.setFramerateLimit(30);
 
     //std::thread first(doStuff, &original);
-    std::thread first(doStuff2, &original2);
+    //std::thread first(doStuff2, &original2);
+
 
 
     while (window.isOpen()){
+        ready = true;
         if (ready){
             text.loadFromImage(img);
             sprite.setTexture(text);
@@ -107,56 +121,56 @@ int main() {
         }
     }
 
-    first.join();
+    //first.join();
     return 0;
 }
 
 void testBitmap(sf::Image& img, std::string filename){
     BitmapLoader loader;
     Bitmap bmp;
-    loader.load(bmp, filename);
+    loader.Load(bmp, filename);
 
     Timeit stoper;
-    stoper.start();
-    bmp.clearColor(Color(255, 255, 255));
-    stoper.stop();
+    stoper.Start();
+    bmp.ClearColor(Color(255, 255, 255));
+    stoper.Stop();
     std::cout << "lena bmp clear ";
-    stoper.time();
+    stoper.Time();
 
     Square sq;
     for (int i = 0; i < 5; i++){
-        sq.randomize(Square(0, 0, 512, 512));
+        sq.Randomize(Square(0, 0, 512, 512));
         std::cout << "x: " << sq.x << std::endl;
         std::cout << "y: " << sq.y << std::endl;
         std::cout << "width: " << sq.width << std::endl;
         std::cout << "height: " << sq.height << std::endl;
-        bmp.drawSquare(sq, Color());
+        bmp.DrawSquare(sq, Color());
         //bmp.drawCircle(sq.x, sq.y, 10.0f, Color());
     }
-    bmp.loadToSFImage(img);
+    bmp.LoadToSFImage(img);
 
-    loader.save(bmp, "../res/test_lena.bmp");
+    loader.Save(bmp, "../res/test_lena.bmp");
 }
 
 void testSFMLImage(sf::Image& img, std::string filename){
     SFMLImageLoader loader;
     SFMLImage sfmlImage;
 
-    loader.load(sfmlImage, filename);
+    loader.Load(sfmlImage, filename);
 
     Circle c;
     for (int i = 0; i < 5; i++){
-        c.randomize(Square(0, 0, 512, 512));
+        c.Randomize(Square(0, 0, 512, 512));
         std::cout << "x: " << c.x << std::endl;
         std::cout << "y: " << c.y << std::endl;
         std::cout << "radius: " << c.radius << std::endl;
-        sfmlImage.drawCircle(c, Color());
+        sfmlImage.DrawCircle(c, Color());
         //bmp.drawCircle(sq.x, sq.y, 10.0f, Color());
     }
 
-    sfmlImage.loadToSFImage(img);
+    sfmlImage.LoadToSFImage(img);
 
-    loader.save(sfmlImage, "../res/test_lena.png");
+    loader.Save(sfmlImage, "../res/test_lena.png");
 }
 
 void testcpp17(){
@@ -177,6 +191,26 @@ void testColor(){
     std::cout << color + color1 << std::endl;
     std::cout << color - color1 << std::endl;
     std::cout << color1 - color << std::endl;
-    std::cout << "diff1: " << color.diff(color1) << std::endl;
-    std::cout << "diff2: " << color1.diff(color) << std::endl;
+    std::cout << "diff1: " << color.Diff(color1) << std::endl;
+    std::cout << "diff2: " << color1.Diff(color) << std::endl;
 }
+
+void TestBitmapImage(){
+    Timeit timer;
+    gen_algo_image::ArashPartowBitmap image;
+
+    image.Load("../res/lena.bmp");
+    timer.Start();
+    for (int i = 0; i < 50; i++){
+        //image.DrawSquare(0, 0, 50, 50, Color(255, 255, 255));
+        image.DrawCircle(50, 50, 20, Color(255, 255, 255));
+    }
+    timer.Stop();
+    std::cout << "time : ";
+    timer.Time();
+
+    image.LoadToSFImage(img);
+
+    return;
+}
+

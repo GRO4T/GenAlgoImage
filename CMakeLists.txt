@@ -12,7 +12,7 @@ endif(WIN32)
 
 
 find_package(SFML 2.5.1 COMPONENTS graphics REQUIRED)
-add_executable(untitled src/main.cpp src/image/bitmap.h src/genetic_algorithm.h src/figures.h src/image/image.h src/image/sfml_image.h src/sorted_container.h src/timeit.h src/individual.h)
+add_executable(untitled src/main.cpp src/image/bitmap.h src/genetic_algorithm.h src/figures.h src/image/image.h src/image/sfml_image.h src/sorted_container.h src/timeit.h src/individual.h src/image/arash_partow_bitmap.h)
 target_link_libraries(untitled sfml-graphics)
 
 

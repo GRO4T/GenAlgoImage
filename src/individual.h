@@ -8,131 +8,134 @@
 #include "image/image.h"
 #include "figures.h"
 
-template<class ImageType>
-class Individual{
-    static_assert(std::is_base_of<Image, ImageType>::value, "ImageType must inherit from Image");
-public:
-    Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds);
-    Individual() {}
+namespace gen_algo_image {
+    template<class ImageType>
+    class Individual {
+        static_assert(std::is_base_of<Image, ImageType>::value, "ImageType must inherit from Image");
+    public:
+        Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds);
 
-    float evaluate(ImageType& original);
-    void mutate();
-    void crossover(Individual& mate);
-    void randomize();
+        Individual() {}
 
-    void loadResultToSFImage(sf::Image& img);
-    void saveResultToFile(std::string filename);
-    void applyFiguresToResult();
-    void clear(){ squares.clear(); circles.clear(); result.clearColor(Color(255, 255, 255)); }
+        Individual &operator=(Individual &i2) {
+            this->squares = i2.squares;
+            this->circles = i2.circles;
+            this->result = i2.result;
+            this->numSquares = i2.numSquares;
+            this->numCircles = i2.numCircles;
+            this->score = i2.score;
+            this->imageBounds = i2.imageBounds;
+            return *this;
+        }
 
-    void setNumSquares(unsigned int numSquares);
-    void setNumCircles(unsigned int numCircles);
-    void setImageBounds(const Square &imageBounds);
+        float Evaluate(ImageType &original);
 
-    float getScore() const;
+        void Mutate();
 
-    friend bool operator<(const Individual<ImageType>& l, const Individual<ImageType>& r){
-        return l.getScore() < r.getScore();
+        void Crossover(Individual &mate);
+
+        void Randomize();
+
+        void LoadResultToSFImage(sf::Image &img);
+
+        void SaveResultToFile(std::string filename);
+
+        void ApplyFiguresToResult();
+
+        void Clear() {
+            squares.clear();
+            circles.clear();
+            result.ClearColor(clearColor);
+        }
+
+
+        float GetScore() const;
+
+        friend bool operator<(const Individual<ImageType> &l, const Individual<ImageType> &r) {
+            return l.GetScore() > r.GetScore();
+        }
+
+    private:
+        const Color clearColor = Color(255, 255, 255);
+
+        std::vector<ColoredSquare> squares;
+        std::vector<ColoredCircle> circles;
+
+        ImageType result;
+
+        unsigned int numSquares;
+        unsigned int numCircles;
+
+        Square imageBounds;
+
+        float score = 0.0f;
+    };
+
+    template<class ImageType>
+    float Individual<ImageType>::Evaluate(ImageType &original) {
+        float score = 0.0f;
+
+        for (int y = 0; y < imageBounds.height; y += 2) {
+            for (int x = 0; x < imageBounds.width; x += 2) {
+                Color originalColor = original.GetPixelColor(x, y);
+                Color color = result.GetPixelColor(x, y);
+                Color diff = color.Diff(originalColor);
+                float pixelScore = 1.0f - (diff.red + diff.green + diff.blue) / 765.0f;
+                score += 4.0f * pixelScore;
+            }
+        }
+
+        score /= (float) (imageBounds.width * imageBounds.height);
+        this->score = score;
+        return score;
     }
 
-private:
-    std::vector<ColoredSquare> squares;
-    std::vector<ColoredCircle> circles;
-
-    ImageType result;
-
-    unsigned int numSquares;
-    unsigned int numCircles;
-
-    Square imageBounds;
-
-    float score = 0.0f;
-};
-
-template<class ImageType>
-float Individual<ImageType>::evaluate(ImageType& original) {
-    float score = 0.0f;
-
-    for (int y = 0; y < imageBounds.height; y+= 1){
-        for (int x = 0; x < imageBounds.width; x+= 1){
-            Color originalColor = original.getPixelColor(x, y);
-            Color color = result.getPixelColor(x, y);
-            Color diff = color.diff(originalColor);
-            float pixelScore = 1.0f - (diff.red + diff.green + diff.blue) / 765.0f;
-            score += pixelScore;
+    template<class ImageType>
+    void Individual<ImageType>::Randomize() {
+        for (int i = 0; i < numSquares; i++) {
+            squares.push_back(ColoredSquare(imageBounds));
+        }
+        for (int i = 0; i < numCircles; i++) {
+            circles.push_back(ColoredCircle(imageBounds));
         }
     }
 
-    score /= (float)(imageBounds.width * imageBounds.height);
-    this->score = score;
-    return score;
-}
-
-template<class ImageType>
-void Individual<ImageType>::randomize() {
-    for (int i = 0; i < numSquares; i++){
-        squares.push_back(ColoredSquare(imageBounds));
+    template<class ImageType>
+    void Individual<ImageType>::LoadResultToSFImage(sf::Image &img) {
+        result.LoadToSFImage(img);
     }
-    for (int i = 0; i < numCircles; i++){
-        circles.push_back(ColoredCircle(imageBounds));
+
+    template<class ImageType>
+    void Individual<ImageType>::SaveResultToFile(std::string filename) {
+        sf::Image img;
+        result.LoadToSFImage(img);
+        img.saveToFile(filename);
     }
-}
 
-template<class ImageType>
-void Individual<ImageType>::loadResultToSFImage(sf::Image &img) {
-    result.loadToSFImage(img);
-}
-
-template<class ImageType>
-void Individual<ImageType>::saveResultToFile(std::string filename) {
-    sf::Image img;
-    result.loadToSFImage(img);
-    img.saveToFile(filename);
-}
-
-template<class ImageType>
-Individual<ImageType>::Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds)
-        :numSquares(numSquares), numCircles(numCircles), imageBounds(imageBounds) {
-    Individual::result.create(
-            imageBounds.width - imageBounds.x,
-            imageBounds.height - imageBounds.y,
-            Color(255, 255, 255)
-    );
-}
-
-template<class ImageType>
-void Individual<ImageType>::applyFiguresToResult() {
-    for (ColoredSquare coloredSquare : squares){
-        result.drawSquare(coloredSquare.square, coloredSquare.color);
+    template<class ImageType>
+    Individual<ImageType>::Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds)
+            :numSquares(numSquares), numCircles(numCircles), imageBounds(imageBounds) {
+        Individual::result.Create(
+                imageBounds.width - imageBounds.x,
+                imageBounds.height - imageBounds.y,
+                Color(255, 255, 255)
+        );
     }
-    for (ColoredCircle coloredCircle : circles){
-        result.drawCircle(coloredCircle.circle, coloredCircle.color);
+
+    template<class ImageType>
+    void Individual<ImageType>::ApplyFiguresToResult() {
+        for (ColoredSquare coloredSquare : squares) {
+            result.DrawSquare(coloredSquare.square, coloredSquare.color);
+        }
+        for (ColoredCircle coloredCircle : circles) {
+            result.DrawCircle(coloredCircle.circle, coloredCircle.color);
+        }
     }
-}
 
-template<class ImageType>
-void Individual<ImageType>::setNumSquares(unsigned int numSquares) {
-    Individual::numSquares = numSquares;
-}
-
-template<class ImageType>
-void Individual<ImageType>::setNumCircles(unsigned int numCircles) {
-    Individual::numCircles = numCircles;
-}
-
-template<class ImageType>
-void Individual<ImageType>::setImageBounds(const Square &imageBounds) {
-    Individual::imageBounds = imageBounds;
-    Individual::result.create(
-            imageBounds.width - imageBounds.x,
-            imageBounds.height - imageBounds.y,
-            Color()
-    );
-}
-
-template<class ImageType>
-float Individual<ImageType>::getScore() const {
-    return score;
+    template<class ImageType>
+    float Individual<ImageType>::GetScore() const {
+        return score;
+    }
 }
 
 #endif //UNTITLED_INDIVIDUAL_H

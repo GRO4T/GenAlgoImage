@@ -7,21 +7,28 @@
 
 #include <vector>
 
-template<class T>
-class SortedContainer{
-public:
-    void add(T value){
-        container.push_back(value);
-    }
-    T& get(int i){
-        return container[i];
-    }
+namespace gen_algo_image{
+    template<class T>
+    class SortedContainer{
+    public:
+        void Add(T value){
+            container.push_back(value);
+        }
+        T& Get(int i){
+            return container[i];
+        }
 
-    void remove(int i){
-        container.erase(i);
-    }
-private:
-    std::vector<T> container;
-};
+        void Remove(int i){
+            container.erase(i);
+        }
+
+        void Sort(){
+            std::sort(container.begin(), container.end());
+        }
+    private:
+        std::vector<T> container;
+    };
+}
+
 
 #endif //UNTITLED_SORTED_CONTAINER_H
