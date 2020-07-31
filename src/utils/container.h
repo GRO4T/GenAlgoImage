@@ -2,15 +2,19 @@
 // Created by DamianPC on 7/7/2020.
 //
 
-#ifndef UNTITLED_SORTED_CONTAINER_H
-#define UNTITLED_SORTED_CONTAINER_H
+#ifndef UNTITLED_CONTAINER_H
+#define UNTITLED_CONTAINER_H
 
 #include <vector>
 
 namespace gen_algo_image{
     template<class T>
-    class SortedContainer{
+    class Container{
     public:
+        void Reserve(int size){
+            container.reserve(size);
+        }
+
         void Add(T value){
             container.push_back(value);
         }
@@ -31,4 +35,4 @@ namespace gen_algo_image{
 }
 
 
-#endif //UNTITLED_SORTED_CONTAINER_H
+#endif //UNTITLED_CONTAINER_H

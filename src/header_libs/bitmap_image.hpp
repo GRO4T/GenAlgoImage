@@ -2392,12 +2392,13 @@ public:
       pen_color_blue_  = colour.blue;
    }
 
+    image_drawer& operator =(const image_drawer& id);
+
 private:
 
    image_drawer(const image_drawer& id);
-   image_drawer& operator =(const image_drawer& id);
 
-   bitmap_image& image_;
+    bitmap_image& image_;
    unsigned int  pen_width_;
    unsigned char pen_color_red_;
    unsigned char pen_color_green_;

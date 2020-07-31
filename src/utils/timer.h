@@ -2,8 +2,8 @@
 // Created by DamianPC on 7/7/2020.
 //
 
-#ifndef UNTITLED_TIMEIT_H
-#define UNTITLED_TIMEIT_H
+#ifndef UNTITLED_TIMER_H
+#define UNTITLED_TIMER_H
 
 #include <iostream>
 #include <chrono>
@@ -11,7 +11,7 @@
 namespace gen_algo_image{
     typedef std::chrono::steady_clock::time_point timepoint;
 
-    class Timeit{
+    class Timer{
     public:
         void Start(){
             startTime = std::chrono::steady_clock::now();
@@ -30,4 +30,4 @@ namespace gen_algo_image{
     };
 }
 
-#endif //UNTITLED_TIMEIT_H
+#endif //UNTITLED_TIMER_H

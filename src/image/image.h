@@ -5,14 +5,21 @@
 #ifndef UNTITLED_IMAGE_H
 #define UNTITLED_IMAGE_H
 
+#include <string.h>
+#include <math.h>
+
 #include <SFML/Graphics/Image.hpp>
-#include "../figures.h"
+
+#include "../utils/shape.h"
+
 namespace gen_algo_image{
     class Image{
     public:
         virtual void Create(unsigned int width, unsigned int height, Color imageColor) = 0;
 
-        virtual bool IsPointInBounds(int x, int y) { return (x >= 0 && x < GetWidth()) && (y >= 0 && y < GetHeight()); }
+        virtual bool IsPointInBounds(int x, int y) {
+            return (x >= 0 && x < GetWidth()) && (y >= 0 && y < GetHeight());
+        }
 
         virtual void DrawPixel(int x, int y, Color color) = 0;
         virtual Color GetPixelColor(int x, int y) = 0;
@@ -20,15 +27,17 @@ namespace gen_algo_image{
         virtual unsigned int GetWidth() const = 0;
         virtual unsigned int GetHeight() const = 0;
 
-        virtual void ClearColor(Color color);
-        virtual void DrawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color);
-        virtual void DrawSquare(Square square, Color color);
-        virtual void DrawCircle(int posx, int posy, int radius, Color color);
-        virtual void DrawCircle(Circle circle, Color color);
+        inline virtual void ClearColor(Color color);
+        inline virtual void DrawSquare(int posx, int posy, unsigned int width, unsigned int height, Color color);
+        inline virtual void DrawSquare(Square square, Color color);
+        inline virtual void DrawCircle(const int &posx, const int &posy, int radius, const Color &color);
+        inline virtual void DrawCircle(const Circle &circle, const Color &color);
 
         virtual void LoadToSFImage(sf::Image& img) = 0;
 
-        virtual Square GetImageBounds();
+        inline virtual Square GetImageBounds();
+
+        virtual void GetPixelColor(const int& x, const int& y, Color& color) = 0;
     };
 
     void Image::ClearColor(Color color) {
@@ -47,7 +56,7 @@ namespace gen_algo_image{
         DrawSquare(square.x, square.y, square.width, square.height, color);
     }
 
-    void Image::DrawCircle(int posx, int posy, int radius, Color color) {
+    void Image::DrawCircle(const int &posx, const int &posy, int radius, const Color &color) {
         if (radius < 0.0f)
             return;
         for (int y = posy - radius; y < posy + radius; y++){
@@ -62,7 +71,7 @@ namespace gen_algo_image{
         }
     }
 
-    void Image::DrawCircle(Circle circle, Color color) {
+    void Image::DrawCircle(const Circle &circle, const Color &color) {
         DrawCircle(circle.x, circle.y, circle.radius, color);
     }
 
