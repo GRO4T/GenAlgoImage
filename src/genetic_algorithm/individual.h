@@ -64,6 +64,10 @@ namespace gen_algo_image {
         float score = 0.0f;
     };
 
+    // templates instantiation
+    template class Individual<Bitmap>;
+    template class Individual<SFML_ImageWrapper>;
+    template class Individual<ArashPartowBitmapWrapper>;
 }
 
 #endif //UNTITLED_INDIVIDUAL_H

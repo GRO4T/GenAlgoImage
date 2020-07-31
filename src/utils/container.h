@@ -7,28 +7,30 @@
 
 #include <vector>
 
-namespace gen_algo_image{
+namespace gen_algo_image {
     template<class T>
-    class Container{
+    class Container {
     public:
-        void Reserve(int size){
+        inline void Reserve(int size) {
             container.reserve(size);
         }
 
-        void Add(T value){
+        inline void Add(T value) {
             container.push_back(value);
         }
-        T& Get(int i){
+
+        inline T &Get(int i) {
             return container[i];
         }
 
-        void Remove(int i){
+        inline void Remove(int i) {
             container.erase(i);
         }
 
-        void Sort(){
+        inline void Sort() {
             std::sort(container.begin(), container.end());
         }
+
     private:
         std::vector<T> container;
     };

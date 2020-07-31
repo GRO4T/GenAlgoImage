@@ -8,22 +8,25 @@
 #include <iostream>
 #include <chrono>
 
-namespace gen_algo_image{
+namespace gen_algo_image {
     typedef std::chrono::steady_clock::time_point timepoint;
 
-    class Timer{
+    class Timer {
     public:
-        void Start(){
+        inline void Start() {
             startTime = std::chrono::steady_clock::now();
         }
-        void Stop(){
+
+        inline void Stop() {
             endTime = std::chrono::steady_clock::now();
         }
-        void Time(){
+
+        inline void Time() {
             std::cout << "time: " <<
                       std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()
                       << "ms" << std::endl;
         }
+
     private:
         timepoint startTime;
         timepoint endTime;
