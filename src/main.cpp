@@ -44,7 +44,7 @@ int main() {
     ArashPartowBitmapWrapper original3;
     original3.Load(bmpFilename);
 
-    std::thread first(RunGeneticAlgorithm<ArashPartowBitmapWrapper>, &original3, 50, 50, 0);
+    std::thread first(RunGeneticAlgorithm<ArashPartowBitmapWrapper>, &original3, 50, 0, 50);
     Display();
     first.join();
 
@@ -83,8 +83,10 @@ template<class ImageType>
 void RunGeneticAlgorithm(ImageType* original, unsigned popSize,
                          unsigned numSquares, unsigned numCircles){
     GeneticAlgorithm<ImageType> geneticAlgorithm(numSquares,  numCircles, original);
+    Individual<ImageType> best;
+
     geneticAlgorithm.CreatePopulation();
-    Individual<ArashPartowBitmapWrapper> best;
+
     for (int i = 0; i < 20; i++){
         geneticAlgorithm.NextGeneration();
         best = geneticAlgorithm.GetBestIndividual();

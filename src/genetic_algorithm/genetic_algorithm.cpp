@@ -21,25 +21,10 @@ namespace gen_algo_image {
 
         timer.Start();
 
-        Container<Individual<ImageType>> temp;
-        temp.Reserve(populationSize);
-
         FitnessFunctionCalculation();
-
         Crossover();
-
-        // create next gen
-        for (int i = 0; i < 10; i++) {
-            temp.Add(population.Get(i));
-        }
-        for (int i = 10; i < populationSize; i++) {
-            Individual<ImageType> individual(numSquares, numCircles, originalImage->GetImageBounds());
-            individual.Randomize();
-            individual.ApplyFiguresToResult();
-            temp.Add(individual);
-        }
-
-        population = temp;
+        Mutation();
+        Selection();
 
         timer.Stop();
 
@@ -54,11 +39,13 @@ namespace gen_algo_image {
             individual->Evaluate(*originalImage);
         }
         population.Sort();
-        bestIndividual = population.Get(0);
-        std::cout << "best score : " << bestIndividual.GetScore() << std::endl;
+
+        SetBestIndividual(population.Get(0));
+        std::cout << "Best " << GetBestIndividual() << std::endl;
+
         // display scores
         for (int i = 0; i < populationSize; i++) {
-            std::cout << "score : " << population.Get(i).GetScore() << std::endl;
+            std::cout << population.Get(i) << std::endl;
         }
     }
 
@@ -87,16 +74,18 @@ namespace gen_algo_image {
             while (mother == nullptr) {
                 float number = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
                 if (number <= probabilityArray[j]) {
-                    std::cout << "found mother (number = " << number << ") (j=" << j << ")" << std::endl;
+                    std::cout << "found mother (number = " << number << ") (j=" << j << ") ";
                     mother = &population.Get(j);
+                    std::cout << *mother << std::endl;
                 }
                 j = (j + 1) % populationSize;
             }
             while (father == nullptr) {
                 float number = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
                 if (number <= probabilityArray[j]) {
-                    std::cout << "found father (number = " << number << ") (j=" << j << ")" << std::endl;
+                    std::cout << "found father (number = " << number << ") (j=" << j << ") ";
                     father = &population.Get(j);
+                    std::cout << *father << std::endl;
                 }
                 j = (j + 1) % populationSize;
             }
@@ -107,6 +96,25 @@ namespace gen_algo_image {
     template<class ImageType>
     void GeneticAlgorithm<ImageType>::Mutation() {
 
+    }
+
+    template<class ImageType>
+    void GeneticAlgorithm<ImageType>::Selection() {
+        Container<Individual<ImageType>> temp;
+        temp.Reserve(populationSize);
+
+        // create next gen
+        for (int i = 0; i < 10; i++) {
+            temp.Add(population.Get(i));
+        }
+        for (int i = 8; i < populationSize; i++) {
+            Individual<ImageType> individual(numSquares, numCircles, originalImage->GetImageBounds());
+            individual.Randomize();
+            individual.ApplyFiguresToResult();
+            temp.Add(individual);
+        }
+
+        population = temp;
     }
 
 /*

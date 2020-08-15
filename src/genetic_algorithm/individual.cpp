@@ -6,6 +6,23 @@
 
 namespace gen_algo_image{
     template<class ImageType>
+    int Individual<ImageType>::next_id = 0;
+
+    template<class ImageType>
+    Individual<ImageType>::Individual() { id = next_id++; }
+
+    template<class ImageType>
+    Individual<ImageType>::Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds)
+            :numSquares(numSquares), numCircles(numCircles), imageBounds(imageBounds) {
+        id = next_id++;
+        Individual::result.Create(
+                imageBounds.width - imageBounds.x,
+                imageBounds.height - imageBounds.y,
+                Color(255, 255, 255)
+        );
+    }
+
+    template<class ImageType>
     Individual<ImageType>& Individual<ImageType>::operator=(const Individual &i2) {
         this->squares = i2.squares;
         this->circles = i2.circles;
@@ -79,15 +96,6 @@ namespace gen_algo_image{
         img.saveToFile(filename);
     }
 
-    template<class ImageType>
-    Individual<ImageType>::Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds)
-            :numSquares(numSquares), numCircles(numCircles), imageBounds(imageBounds) {
-        Individual::result.Create(
-                imageBounds.width - imageBounds.x,
-                imageBounds.height - imageBounds.y,
-                Color(255, 255, 255)
-        );
-    }
 
     template<class ImageType>
     void Individual<ImageType>::ApplyFiguresToResult() {

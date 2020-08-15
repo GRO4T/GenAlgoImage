@@ -15,9 +15,8 @@ namespace gen_algo_image {
     class Individual {
         static_assert(std::is_base_of<Image, ImageType>::value, "ImageType must inherit from Image");
     public:
+        Individual();
         Individual(unsigned int numSquares, unsigned int numCircles, const Square imageBounds);
-
-        Individual() {}
 
         Individual &operator=(const Individual &i2);
 
@@ -44,8 +43,15 @@ namespace gen_algo_image {
 
         float GetScore() const;
 
+        int GetId() { return id; }
+
         friend bool operator<(const Individual<ImageType> &l, const Individual<ImageType> &r) {
             return l.GetScore() > r.GetScore();
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const Individual<ImageType>& individual){
+            os << "individual (id = " << individual.id << " ) with score : " << individual.score;
+            return os;
         }
 
     private:
@@ -62,6 +68,9 @@ namespace gen_algo_image {
         Square imageBounds;
 
         float score = 0.0f;
+
+        int id;
+        static int next_id;
     };
 
     // templates instantiation

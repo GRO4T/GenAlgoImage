@@ -10,6 +10,7 @@
 #include <set>
 #include <SFML/Graphics/Image.hpp>
 #include <type_traits>
+#include <mutex>
 
 #include "../utils/timer.h"
 #include "individual.h"
@@ -32,8 +33,20 @@ namespace gen_algo_image {
 
         void Mutation();
 
+        void Selection();
+
         Individual<ImageType> GetBestIndividual() {
-            return bestIndividual;
+            Individual<ImageType> temp;
+            mutex.lock();
+            temp = bestIndividual;
+            mutex.unlock();
+            return temp;
+        }
+
+        void SetBestIndividual(const Individual<ImageType>& individual){
+            mutex.lock();
+            bestIndividual = individual;
+            mutex.unlock();
         }
 
         //static unsigned genNumber = 0;
@@ -47,6 +60,7 @@ namespace gen_algo_image {
         const unsigned offspringSize = 50;
         ImageType *originalImage;
 
+        std::mutex mutex;
         Individual<ImageType> bestIndividual;
     };
 
