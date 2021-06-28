@@ -1,100 +1,37 @@
-#include "genetic_algorithm/genetic_algorithm.h"
-
 #include <SFML/Graphics.hpp>
-#include <thread>
-#include <atomic>
-#include <iostream>
-#include <cstddef>
-
-using gen_algo_image::Bitmap;
-using gen_algo_image::BitmapLoader;
-using gen_algo_image::SFML_ImageWrapper;
-using gen_algo_image::SFMLImageLoader;
-using gen_algo_image::GeneticAlgorithm;
-using gen_algo_image::Individual;
-using gen_algo_image::Color;
-using gen_algo_image::Square;
-using gen_algo_image::Circle;
-using gen_algo_image::Timer;
-using gen_algo_image::ArashPartowBitmapWrapper;
-
-std::atomic<bool> ready = false;
-std::atomic<bool> windowOpen = true;
-sf::Image img;
-
-template<class ImageType>
-void RunGeneticAlgorithm(ImageType* original, unsigned popSize,
-                         unsigned numSquares, unsigned numCircles);
-void Display();
+#include <stdexcept>
 
 int main() {
-    srand (time(NULL));
+    sf::RenderWindow window(sf::VideoMode(500, 500), "Genetic Image");
 
-    std::string bmpFilename = "../res/lena.bmp";
-    std::string sfmlImageFilename = "../res/lena.png";
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+    sf::RenderTexture renderTexture;
+    if (!renderTexture.create(500, 500))
+        throw std::runtime_error("error creating render texture");
+    renderTexture.clear();
+    renderTexture.draw(shape);
+    renderTexture.display();
+    const sf::Texture& texture = renderTexture.getTexture();
 
-    SFML_ImageWrapper original2;
-    SFMLImageLoader loader2;
-    loader2.Load(original2, sfmlImageFilename);
+    sf::Texture originalImage;
+    if (!originalImage.loadFromFile("res/lena.png"))
+        throw std::runtime_error("error loading original image");
 
-    BitmapLoader loader;
-    Bitmap original;
-    loader.Load(original, bmpFilename);
+    sf::Sprite displayedSprite(originalImage);
 
-    ArashPartowBitmapWrapper original3;
-    original3.Load(bmpFilename);
-
-    std::thread first(RunGeneticAlgorithm<ArashPartowBitmapWrapper>, &original3, 50, 0, 50);
-    Display();
-    first.join();
-
-    return 0;
-}
-
-void Display(){
-    sf::Texture text;
-    sf::Sprite sprite;
-
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ");
-    window.setFramerateLimit(30);
-
-    while (window.isOpen()){
-        if (ready){
-            text.loadFromImage(img);
-            sprite.setTexture(text);
-            ready = false;
-        }
-        window.clear();
-        window.draw(sprite);
-        window.display();
+    while (window.isOpen())
+    {
         sf::Event event;
         while (window.pollEvent(event))
         {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed){
+            if (event.type == sf::Event::Closed)
                 window.close();
-                windowOpen = false;
-            }
         }
+
+        window.clear();
+        window.draw(displayedSprite);
+        window.display();
     }
-}
-
-template<class ImageType>
-void RunGeneticAlgorithm(ImageType* original, unsigned popSize,
-                         unsigned numSquares, unsigned numCircles){
-    GeneticAlgorithm<ImageType> geneticAlgorithm(numSquares,  numCircles, original);
-    Individual<ImageType> best;
-
-    geneticAlgorithm.CreatePopulation();
-
-    for (int i = 0; i < 20; i++){
-        geneticAlgorithm.NextGeneration();
-        best = geneticAlgorithm.GetBestIndividual();
-        best.LoadResultToSFImage(img);
-        ready = true;
-
-        while (ready){
-            if (!windowOpen) return;
-        }
-    }
+    return 0;
 }
