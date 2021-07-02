@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (UNIX)
     find_package(SFML 2.5 COMPONENTS graphics)
+    include_directories(include)
     file (GLOB sources
         "include/*.hpp"
         "src/*.cpp"
