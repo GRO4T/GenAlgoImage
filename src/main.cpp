@@ -1,7 +1,9 @@
-#include <stdexcept>
-#include <vector>
-#include <memory>
+
+#include <unistd.h>
+
 #include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #include "image_generator.hpp"
 
@@ -9,7 +11,6 @@ using namespace gro4t;
 
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(500, 500), "Genetic Image");
 
     sf::Image original_image;
     if (!original_image.loadFromFile("res/lena.png"))
@@ -17,30 +18,33 @@ int main() {
 
     sf::Sprite displayedSprite;
 
-    ImageGenerator image_generator(original_image, 50, 10, 100);
+    ImageGenerator image_generator(original_image, 10, 40, original_image.getSize().x);
     image_generator.init();
-    image_generator.evaluation();
-    image_generator.displayLastGenerationInfo();
+//    for (int i = 0; i < 10; ++i) {
+//        image_generator.nextGeneration();
+//    }
 
-    auto& best = image_generator.getBest();
-    std::cout << "best id: " << best.getId() << " score: " << best.getFitnessScore() << std::endl;
+//    auto final_generation = image_generator.getGeneration();
+//    int i = 0;
 
+    sf::RenderWindow window(sf::VideoMode(500, 500), "Genetic Image");
     while (window.isOpen())
     {
+//        sleep(1);
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-
-//        const auto img_num = std::rand() % 50;
-//        std::cout << "displaying image number: " << img_num << std::endl;
-        displayedSprite.setTexture(best.getTexture());
-
-        window.clear();
+//        std::cout << "genome: " << i << std::endl;
+//        displayedSprite.setTexture(final_generation[i].getTexture());
+        displayedSprite.setTexture(image_generator.getBest().getTexture());
+        window.clear(sf::Color::Black);
         window.draw(displayedSprite);
         window.display();
+        image_generator.nextGeneration();
+//        i = (i + 1) % 20;
     }
     return 0;
 }
