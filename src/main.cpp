@@ -15,14 +15,15 @@ int main() {
     if (!original_image.loadFromFile("res/lena.png"))
         throw std::runtime_error("error loading original image");
 
-    auto original_image_size = original_image.getSize();
-    GeneratedImage generated_image = generateRandomImage(10, 100, original_image_size.x, original_image_size.y);
-    sf::Sprite displayedSprite(generated_image.getTexture());
+    sf::Sprite displayedSprite;
 
     ImageGenerator image_generator(original_image, 50, 10, 100);
     image_generator.init();
-    image_generator.evaluate();
+    image_generator.evaluation();
     image_generator.displayLastGenerationInfo();
+
+    auto& best = image_generator.getBest();
+    std::cout << "best id: " << best.getId() << " score: " << best.getFitnessScore() << std::endl;
 
     while (window.isOpen())
     {
@@ -33,9 +34,9 @@ int main() {
                 window.close();
         }
 
-        const auto img_num = std::rand() % 50;
-        std::cout << "displaying image number: " << img_num << std::endl;
-        displayedSprite.setTexture(image_generator.images[img_num].getTexture());
+//        const auto img_num = std::rand() % 50;
+//        std::cout << "displaying image number: " << img_num << std::endl;
+        displayedSprite.setTexture(best.getTexture());
 
         window.clear();
         window.draw(displayedSprite);
