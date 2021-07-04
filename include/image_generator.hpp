@@ -7,22 +7,22 @@
 
 namespace gro4t {
 
-struct Configuration {
+struct ImageGeneratorConfig {
     double mutation_rate = 1;
     double percent_worst = 0.2;
     int generations_per_circle = 100;
     int pop_size;
-    ImageProps image_props;
+    GeneratedImageProps image_props;
     sf::Image original_image;
 };
 
 struct State {
-    State(const Configuration& config) : config(config), best(std::nullopt), generation(0), current_circle_generation(0), current_circle(0) {}
+    State(const ImageGeneratorConfig& config) : config(config), best(std::nullopt), generation(0), current_circle_generation(0), current_circle(0) {}
     std::optional<GeneratedImage> best;
     int generation;
     int current_circle_generation;
     int current_circle;
-    Configuration config;
+    ImageGeneratorConfig config;
 
     bool nextCircle() {
         return current_circle_generation == config.generations_per_circle;
@@ -37,13 +37,10 @@ struct State {
 
 class ImageGenerator {
 public:
-    ImageGenerator(const Configuration& config)
+    ImageGenerator(const ImageGeneratorConfig& config)
         : config(config), state(config), generator(std::random_device{}()), real_dist(0.0, 1.0) {}
 
     void init() {
-        const auto original_image_size = original_image.getSize();
-        const auto img_width = original_image_size.x;
-        const auto img_height = original_image_size.y;
         for (int i = 0; i < config.pop_size; ++i) {
             images.push_back(GeneratedImage(config.image_props));
         }
@@ -55,7 +52,9 @@ public:
         state.nextGeneration();
         if (state.current_circle_generation == config.generations_per_circle) {
             state.current_circle_generation = 0;
+            state.current_circle++;
             for (auto& img : images) img.addCircle();
+            evaluation();
         }
         mutation();
         selection();
@@ -80,11 +79,9 @@ public:
 
 private:
     State state;
-    Configuration config;
+    ImageGeneratorConfig config;
 
     std::vector<GeneratedImage> images;
-    ImageProps image_props;
-    sf::Image original_image;
 
     std::mt19937 generator;
     std::uniform_real_distribution<double> real_dist;
@@ -98,7 +95,7 @@ private:
 
     void evaluation() {
         for (auto& img : images) {
-            img.evaluate(original_image);
+            img.evaluate(config.original_image);
         }
         updateBest();
     }
@@ -121,7 +118,7 @@ private:
             else
                 new_images.push_back(warriors[1]);
         }
-        images = std::move(new_images);
+        images = new_images;
     }
 
     void displayLastGenerationInfo() {
@@ -129,10 +126,6 @@ private:
         std::cout << "generation: " << state.generation << std::endl;
         std::cout << "best id: " << best.getId() << " score: " << best.getFitnessScore()
                   << std::endl;
-        //        for (const auto& img : images) {
-        //            std::cout << "Image with id: " << img.getId() << std::endl;
-        //            std::cout << "\tscore: " << img.getFitnessScore() << std::endl;
-        //        }
     }
 };
 

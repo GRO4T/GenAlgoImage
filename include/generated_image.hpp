@@ -7,13 +7,14 @@ namespace gro4t {
 
 class GeneratedImage {
 public:
-    GeneratedImage(const ImageProps& image_props)
+    GeneratedImage(const GeneratedImageProps& image_props)
         : id(next_id++),
           fitness_score(0.0),
           image(std::nullopt),
           render_texture(nullptr),
           image_props(image_props),
-          dirty(false) {
+          dirty(true) {
+        addCircle();
     }
 
     GeneratedImage(const GeneratedImage& other) {
@@ -25,9 +26,9 @@ public:
         image_props = other.image_props;
         circle_prop_list = other.circle_prop_list;
         render_texture = nullptr;
-        image = other.image;
+        image = std::nullopt;
         fitness_score = other.fitness_score;
-        dirty = other.dirty;
+        dirty = true;
         return *this;
     }
 
@@ -51,23 +52,16 @@ public:
             }
         }
         fitness_score = score / (original_image_size.x * original_image_size.y);
-        dirty = false;
     }
 
-    void mutate() {
+    void mutate(int circle_index) {
         clear();
-        for (auto& circle_prop : circle_prop_list) {
-            const double r = real_dist(generator);
-            if (r < circle_mutation_rate)
-                circle_prop.mutate();
-        }
+        const double r = real_dist(generator);
+        if (r < circle_mutation_rate)
+            circle_prop_list.at(circle_index).mutate();
     }
 
     void clear() {
-        if (render_texture != nullptr) {
-            auto* rt = render_texture.release();
-            delete rt;
-        }
         image = std::nullopt;
         dirty = true;
     }
@@ -81,7 +75,8 @@ public:
     }
     double getFitnessScore() const { return fitness_score; }
     const sf::RenderTexture& getRenderTexture() {
-        if (render_texture == nullptr) generateRenderTexture();
+        if (dirty) generateRenderTexture();
+        dirty = false;
         return *render_texture;
     }
 
@@ -94,13 +89,13 @@ private:
     static std::uniform_real_distribution<double> real_dist;
     static std::uniform_int_distribution<int> int_dist;
 
-    bool dirty;  // tells if image changed since last evaluation
+    bool dirty;  // tells if image needs to be redrawn
     int id;
     std::vector<CircleProps> circle_prop_list;
     RenderTexturePtr render_texture;
     std::optional<sf::Image> image;
     double fitness_score;
-    ImageProps image_props;
+    GeneratedImageProps image_props;
 
     double calculatePartialMatchPoints(const sf::Color distance) {
         int sum = distance.r + distance.g + distance.b;
@@ -109,7 +104,8 @@ private:
     }
 
     void generateRenderTexture() {
-        render_texture = std::make_unique<sf::RenderTexture>();
+        if (!render_texture)
+            render_texture = std::make_unique<sf::RenderTexture>();
         if (!render_texture->create(image_props.width, image_props.height))
             throw std::runtime_error("error creating render texture");
         render_texture->clear();

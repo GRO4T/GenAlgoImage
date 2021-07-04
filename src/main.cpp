@@ -18,7 +18,9 @@ int main() {
 
     sf::Sprite displayedSprite;
 
-    ImageGenerator image_generator(original_image, 10, 40, original_image.getSize().x);
+    GeneratedImageProps image_props(100, original_image);
+    ImageGeneratorConfig config{1, 0.2, 100, 20, image_props, original_image};
+    ImageGenerator image_generator(config);
     image_generator.init();
 //    for (int i = 0; i < 10; ++i) {
 //        image_generator.nextGeneration();

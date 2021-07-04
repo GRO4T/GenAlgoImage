@@ -10,11 +10,21 @@ namespace gro4t {
 
 using RenderTexturePtr = std::unique_ptr<sf::RenderTexture>;
 
-struct ImageProps {
+struct GeneratedImageProps {
     int circles_num;
     float max_radius;
     uint32_t width;
     uint32_t height;
+
+    GeneratedImageProps(int circles_num, const sf::Image& original_image): circles_num(circles_num) {
+        const auto original_image_size = original_image.getSize();
+        width = original_image_size.x;
+        height = original_image_size.y;
+        max_radius = std::max(width, height);
+    }
+
+    GeneratedImageProps() {}
+    ~GeneratedImageProps() {}
 };
 
 inline sf::Color distance(const sf::Color& color_a, const sf::Color& color_b) {
@@ -33,22 +43,14 @@ inline std::ostream& operator<<(std::ostream& os, const sf::Color& color) {
     return os;
 }
 
-struct CircleProps {
+class CircleProps {
+public:
     float radius;
-    float max_radius;
     sf::Vector2f position;
     sf::Color color;
 
-    CircleProps(int width, int height, float max_radius) : max_radius(max_radius) {
-        radius = uniform_real_dist(generator) * max_radius;
-        float pos_x = uniform_real_dist(generator) * (width + 2 * radius) - 2 * radius;
-        float pos_y = uniform_real_dist(generator) * (height + 2 * radius) - 2 * radius;
-        position = sf::Vector2f(pos_x, pos_y);
-        int r = uniform_int_dist(generator) % 256;
-        int g = uniform_int_dist(generator) % 256;
-        int b = uniform_int_dist(generator) % 256;
-        color = sf::Color(r, g, b);
-    }
+    CircleProps(const GeneratedImageProps& image_props);
+    ~CircleProps() {}
 
     void mutate() {
         int prop_number = uniform_int_dist(generator) % 3;
@@ -60,7 +62,7 @@ struct CircleProps {
                 mutatePosition();
                 break;
             case 2:
-                mutateRadius(max_radius);
+                mutateRadius();
                 break;
         }
     }
@@ -76,6 +78,9 @@ private:
     static std::normal_distribution<> position_dist;
     static const int radius_dist_stdev = 10;
     static std::normal_distribution<> radius_dist;
+
+    GeneratedImageProps image_props;
+
 
     void mutateColor() {
         const int color_component = uniform_int_dist(generator) % 3;
@@ -102,14 +107,14 @@ private:
             position.y += amount;
     }
 
-    void mutateRadius(const float max_radius) {
+    void mutateRadius() {
         const int direction = uniform_int_dist(generator) % 2 == 0 ? -1 : 1;
         const double amount = radius_dist(generator);
         radius += amount * direction;
         if (radius < 0)
             radius = 0;
-        else if (radius > max_radius)
-            radius = max_radius;
+        else if (radius > image_props.max_radius)
+            radius = image_props.max_radius;
     }
 };
 
