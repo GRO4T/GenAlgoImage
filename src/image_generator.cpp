@@ -10,75 +10,39 @@ void ImageGenerator::nextGeneration() {
     if (state.nextCircle()) {
         state.current_circle_generation = 0;
         state.current_circle++;
-        for (auto& img : images) img.addCircle();
-        evaluation();
+        state.sigma = 1.0;
     }
-    mutation();
-    selection();
-    evaluation();
+    auto new_generated_image = getGeneratedImage();
+    if (new_generated_image.getCirclesNum() <= state.current_circle)
+        new_generated_image.addCircle();
+    else
+        new_generated_image.mutate(state.current_circle, state.sigma);
+    new_generated_image.evaluate(config.original_image);
+    if (new_generated_image.getFitnessScore() > getGeneratedImage().getFitnessScore()) {
+        state.generated_image = new_generated_image;
+        state.result_table.push_back(true);
+    }
+    else
+        state.result_table.push_back(false);
+    if (--state.generations_since_last_evaluation == 0) {
+        state.generations_since_last_evaluation = state.generations_per_evaluation;
+        int successes = std::count(state.result_table.begin(), state.result_table.end(), true);
+        double success_rate = successes / (double) state.generations_per_evaluation;
+        if (success_rate > 0.2)
+            state.sigma = 1.22 * state.sigma;
+        if (success_rate < 0.2)
+            state.sigma = 0.82 * state.sigma;
+    }
     displayLastGenerationInfo();
 }
 
-GeneratedImage& ImageGenerator::getBest() {
-    if (state.best.has_value()) return state.best.value();
-    updateBest();
-    return state.best.value();
-}
-
-void ImageGenerator::updateBest() {
-    state.best = *std::max_element(images.begin(), images.end(),
-                                   [](const GeneratedImage& a, const GeneratedImage& b) {
-                                     return a.getFitnessScore() < b.getFitnessScore();
-                                   });
-}
-
-void ImageGenerator::init() {
-    for (int i = 0; i < config.pop_size; ++i) {
-        images.push_back(GeneratedImage(config.image_props));
-    }
-    evaluation();
-    displayLastGenerationInfo();
-}
-
-void ImageGenerator::mutation() {
-    for (auto& img : images) {
-        const auto r = real_dist(generator);
-        if (r < config.mutation_rate) img.mutate(state.current_circle);
-    }
-}
-
-void ImageGenerator::evaluation() {
-    for (auto& img : images) {
-        img.evaluate(config.original_image);
-    }
-    updateBest();
-}
-
-void ImageGenerator::selection() {
-    std::vector<GeneratedImage> new_images;
-    new_images.push_back(getBest());
-    std::sort(images.begin(), images.end(),
-              [](const GeneratedImage& a, const GeneratedImage& b) {
-                return a.getFitnessScore() < b.getFitnessScore();
-              });
-    for (int i = 0; i < int(config.pop_size * config.percent_worst); ++i) {
-        new_images.push_back(images[i]);
-    }
-    while (new_images.size() < config.pop_size) {
-        std::vector<GeneratedImage> warriors;
-        std::sample(images.begin(), images.end(), std::back_inserter(warriors), 2, generator);
-        if (warriors[0].getFitnessScore() >= warriors[1].getFitnessScore())
-            new_images.push_back(warriors[0]);
-        else
-            new_images.push_back(warriors[1]);
-    }
-    images = new_images;
+GeneratedImage& ImageGenerator::getGeneratedImage() {
+    return state.generated_image;
 }
 
 void ImageGenerator::displayLastGenerationInfo() {
-    auto& best = getBest();
     std::cout << "generation: " << state.generation << std::endl;
-    std::cout << "best id: " << best.getId() << " score: " << best.getFitnessScore()
+    std::cout << " score: " << getGeneratedImage().getFitnessScore()
               << std::endl;
 }
 

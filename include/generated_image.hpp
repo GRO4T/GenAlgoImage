@@ -12,9 +12,10 @@ public:
     GeneratedImage(const GeneratedImage& other);
     GeneratedImage& operator=(const GeneratedImage& other);
 
+    std::size_t getCirclesNum() const { return circle_prop_list.size(); }
     void addCircle();
     void evaluate(const sf::Image original_image);
-    void mutate(int circle_index);
+    void mutate(int circle_index, double sigma);
     void clear();
 
     int getId() const;
@@ -25,7 +26,6 @@ public:
 
 private:
     static int next_id;
-    static constexpr double circle_mutation_rate = 1;
 
     static std::mt19937 generator;
     static std::uniform_real_distribution<double> real_dist;

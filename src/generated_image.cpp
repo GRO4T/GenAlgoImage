@@ -57,10 +57,9 @@ void GeneratedImage::evaluate(const sf::Image original_image) {
     fitness_score = score / (original_image_size.x * original_image_size.y);
 }
 
-void GeneratedImage::mutate(int circle_index) {
+void GeneratedImage::mutate(int circle_index, double sigma) {
     clear();
-    const double r = real_dist(generator);
-    if (r < circle_mutation_rate) circle_prop_list.at(circle_index).mutate();
+    circle_prop_list.at(circle_index).mutate(sigma);
 }
 
 void GeneratedImage::clear() {
