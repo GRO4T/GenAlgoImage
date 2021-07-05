@@ -8,13 +8,20 @@
 namespace gro4t {
 
 struct ImageGeneratorConfig {
-    int generations_per_circle = 100;
+    int generations_per_circle;
+    int generations_per_evaluation;
     GeneratedImageProps image_props;
     sf::Image original_image;
 };
 
 struct State {
-    State(const ImageGeneratorConfig& config) : config(config), generation(0), current_circle_generation(0), current_circle(0), generated_image(config.image_props) {}
+    State(const ImageGeneratorConfig& config)
+        : config(config),
+          generation(0),
+          current_circle_generation(0),
+          current_circle(0),
+          generated_image(config.image_props),
+          generations_since_last_evaluation(config.generations_per_evaluation) {}
     int generation;
     int current_circle_generation;
     int current_circle;
@@ -22,7 +29,6 @@ struct State {
     double sigma = 1.0;
     std::vector<bool> result_table;
     int generations_since_last_evaluation = 10;
-    int generations_per_evaluation = 10; // TODO move to config
     GeneratedImage generated_image;
 
     bool nextCircle() { return current_circle_generation == config.generations_per_circle; }
@@ -31,7 +37,6 @@ struct State {
         ++current_circle_generation;
     }
 };
-
 
 class ImageGenerator {
 public:

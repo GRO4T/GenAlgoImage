@@ -21,15 +21,50 @@ CircleProps::CircleProps(const GeneratedImageProps& image_props): image_props(im
 }
 
 void CircleProps::mutate(double sigma) {
-    int prop_number = uniform_int_dist(generator) % 3;
-    auto r = uniform_real_dist(generator);
-    if (r < 0.1 * sigma)
+    auto r = normal_real_dist(generator);
+    if (std::abs(r) < 0.7) {
+        auto prop_number = uniform_int_dist(generator) % 3;
+        switch (prop_number) {
+            case 0:
+                mutateColor(sigma);
+                break;
+            case 1:
+                mutatePosition(sigma);
+                break;
+            case 2:
+                mutateRadius(sigma);
+                break;
+        }
+    }
+    if (std::abs(r) < 1.0) {
+        auto pair_number = uniform_int_dist(generator) % 3;
+        switch (pair_number) {
+            case 0:
+                mutateColor(sigma);
+                mutatePosition(sigma);
+                break;
+            case 1:
+                mutateColor(sigma);
+                mutateRadius(sigma);
+                break;
+            case 2:
+                mutatePosition(sigma);
+                mutateRadius(sigma);
+                break;
+        }
+    }
+    else {
+        mutateColor(sigma);
+        mutatePosition(sigma);
+        mutateRadius(sigma);
+    }
+    if (r < 0.4 * sigma)
         mutateColor(sigma);
     r = uniform_real_dist(generator);
     if (r < 0.7 * sigma)
         mutatePosition(sigma);
     r = uniform_real_dist(generator);
-    if (r < 0.2 * sigma)
+    if (r < 0.4 * sigma)
         mutateRadius(sigma);
 }
 

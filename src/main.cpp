@@ -18,8 +18,8 @@ int main() {
 
     sf::Sprite displayedSprite;
 
-    GeneratedImageProps image_props(10, original_image, 400, 5);
-    ImageGeneratorConfig config{100, image_props, original_image};
+    GeneratedImageProps image_props(20, original_image, 400, 5);
+    ImageGeneratorConfig config{500, 10, image_props, original_image};
     ImageGenerator image_generator(config);
 
     sf::RenderWindow window(sf::VideoMode(500, 500), "Genetic Image");
