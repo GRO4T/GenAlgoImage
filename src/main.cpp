@@ -18,7 +18,7 @@ int main() {
 
     sf::Sprite displayedSprite;
 
-    GeneratedImageProps image_props(20, original_image, 400, 5);
+    GeneratedImageProps image_props(50, original_image, 400, 5);
     ImageGeneratorConfig config{500, 10, image_props, original_image};
     ImageGenerator image_generator(config);
 

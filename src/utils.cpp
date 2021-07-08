@@ -36,7 +36,7 @@ void CircleProps::mutate(double sigma) {
                 break;
         }
     }
-    if (std::abs(r) < 1.0) {
+    else if (std::abs(r) < 1.0) {
         auto pair_number = uniform_int_dist(generator) % 3;
         switch (pair_number) {
             case 0:
@@ -58,14 +58,6 @@ void CircleProps::mutate(double sigma) {
         mutatePosition(sigma);
         mutateRadius(sigma);
     }
-    if (r < 0.4 * sigma)
-        mutateColor(sigma);
-    r = uniform_real_dist(generator);
-    if (r < 0.7 * sigma)
-        mutatePosition(sigma);
-    r = uniform_real_dist(generator);
-    if (r < 0.4 * sigma)
-        mutateRadius(sigma);
 }
 
 void CircleProps::mutateColor(double sigma) {

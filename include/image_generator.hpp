@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime>
+#include <queue>
 
 #include "generated_image.hpp"
 #include "utils.hpp"

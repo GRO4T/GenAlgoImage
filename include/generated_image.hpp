@@ -28,7 +28,8 @@ private:
     static int next_id;
 
     static std::mt19937 generator;
-    static std::uniform_real_distribution<double> real_dist;
+    static std::normal_distribution<double> normal_dist;
+    static std::uniform_int_distribution<int> uniform_int_dist;
 
     bool dirty;  // tells if image needs to be redrawn
     int id;
@@ -39,6 +40,10 @@ private:
     GeneratedImageProps image_props;
 
     void generateRenderTexture();
+    void mutateLayer(double sigma);
+    void mutatePosition(double sigma);
+    void mutateColor(double sigma);
+    void mutateRadius(double sigma);
 };
 
 }  // namespace gro4t
