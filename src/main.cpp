@@ -6,22 +6,15 @@
 #include <stdexcept>
 
 #include "image_generator.hpp"
+#include "config_loader.hpp"
 
 using namespace gro4t;
 
 
 int main() {
 
-    sf::Image original_image;
-    if (!original_image.loadFromFile("res/lena.png"))
-        throw std::runtime_error("error loading original image");
-
     sf::Sprite displayedSprite;
-
-    GeneratedImageProps image_props(50, original_image, 400, 5);
-    ImageGeneratorConfig config{500, 10, image_props, original_image};
-    ImageGenerator image_generator(config);
-
+    ImageGenerator image_generator(ConfigLoader::loadConfig("res/image_generator.conf"));
     sf::RenderWindow window(sf::VideoMode(500, 500), "Genetic Image");
     while (window.isOpen())
     {
