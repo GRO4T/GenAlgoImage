@@ -8,7 +8,7 @@ ImageGenerator::ImageGenerator(const ImageGeneratorConfig& config)
 void ImageGenerator::nextGeneration() {
     state.nextGeneration();
     if (state.nextCircle()) {
-        state.current_circle_generation = 0;
+        state.current_circle_progress = 0;
         state.current_circle = (state.current_circle + 1) % config.image_props.circles_num;
         state.sigma = 1.0;
     }
@@ -24,14 +24,15 @@ void ImageGenerator::nextGeneration() {
         state.result_table.push_back(true);
     } else
         state.result_table.push_back(false);
-    if (--state.generations_since_last_evaluation == 0) {
-        state.generations_since_last_evaluation = config.generations_per_evaluation;
+    if (--state.last_sigma_evaluation == 0) {
+        state.last_sigma_evaluation = config.sigma_evaluation_frequency;
         int successes = std::count(state.result_table.begin(), state.result_table.end(), true);
-        double success_rate = successes / (double)config.generations_per_evaluation;
+        double success_rate = successes / (double)config.sigma_evaluation_frequency;
         if (success_rate > 0.2) state.sigma = 1.22 * state.sigma;
         if (success_rate < 0.2) state.sigma = 0.82 * state.sigma;
     }
-    displayLastGenerationInfo();
+    if (state.generation % config.display_info_frequency == 0)
+        displayLastGenerationInfo();
 }
 
 GeneratedImage& ImageGenerator::getGeneratedImage() { return state.generated_image; }

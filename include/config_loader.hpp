@@ -60,13 +60,16 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& value) {
 class ConfigLoader {
 public:
     static ImageGeneratorConfig loadConfig(const std::string& path) {
+        std::cout << "Started loading config..." << std::endl;
         std::map<std::string, ConfigValue> config;
         std::ifstream config_file(path);
         std::string line;
         while (std::getline(config_file, line)) {
             config.insert(parseEntry(line));
         }
-        return createImageGeneratorConfig(config);
+        auto image_generator_config = createImageGeneratorConfig(config);
+        std::cout << "Finished loading config..." << std::endl;
+        return image_generator_config;
     }
 
 private:
@@ -141,13 +144,15 @@ private:
         for (const auto& entry : config) {
             auto& name = entry.first;
             auto& value = entry.second;
-            std::cout << name << " " << value << std::endl;
+            std::cout << name << "=" << value << std::endl;
             if (name == "circles_num")
                 image_props.circles_num = getConfigValue<int>(entry, ConfigValueType::INTEGER);
-            else if (name == "evaluate_after")
-                image_generator_config.generations_per_evaluation = getConfigValue<int>(entry, ConfigValueType::INTEGER);
-            else if (name == "next_circle_after")
-                image_generator_config.generations_per_circle = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+            else if (name == "sigma_evaluation_frequency")
+                image_generator_config.sigma_evaluation_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+            else if (name == "next_circle_frequency")
+                image_generator_config.next_circle_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+            else if (name == "display_info_frequency")
+                image_generator_config.display_info_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
             else if (name == "max_radius")
                 image_props.max_radius = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
             else if (name == "min_radius")
