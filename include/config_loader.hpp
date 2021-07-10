@@ -109,8 +109,7 @@ private:
         while (++line_it != line_end) {
             if (*line_it == '.')
                 is_integer = false;
-            else
-                value += *line_it;
+            value += *line_it;
         }
         if (is_integer) {
             int int_value = std::stoi(value);

@@ -23,6 +23,7 @@ public:
     const sf::Image& getImage();
     double getFitnessScore() const;
     const sf::RenderTexture& getRenderTexture();
+    const std::vector<CircleProps>& getCirclePropList() const { return circle_prop_list; }
 
 private:
     static int next_id;

@@ -13,7 +13,7 @@ namespace gro4t {
 class ImageGenerator {
 public:
     explicit ImageGenerator(const ImageGeneratorConfig& config);
-    ~ImageGenerator() { std::cout << "Calling Image Generator desctructor" << std::endl; }
+    ~ImageGenerator() {}
 
     void nextGeneration();
     GeneratedImage& getGeneratedImage();

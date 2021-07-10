@@ -47,11 +47,11 @@ void ImageGenerator::displayLastGenerationInfo() {
 }
 
 void ImageGenerator::loadStateFromJSON(const std::string path) {
-
+    state.loadFromJSON(path);
 }
 
 void ImageGenerator::saveStateToJSON(const std::string path) {
-
+    state.saveToJSON(path);
 }
 
 }  // namespace gro4t
