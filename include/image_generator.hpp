@@ -17,6 +17,7 @@ public:
 
     void nextGeneration();
     GeneratedImage& getGeneratedImage();
+    int getGeneration() const { return state.generation; }
     void loadStateFromJSON(const std::string path);
     void saveStateToJSON(const std::string path);
 
