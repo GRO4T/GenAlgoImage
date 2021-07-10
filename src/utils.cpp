@@ -108,9 +108,12 @@ void CircleProps::mutateRadius(double sigma) {
     else if (radius > image_props.max_radius)
         radius = image_props.max_radius;
 }
+CircleProps::CircleProps(float radius, const sf::Vector2f& position, const sf::Color& color,
+                         const GeneratedImageProps& image_props)
+    : radius(radius), position(position), color(color), image_props(image_props) {}
 
 GeneratedImageProps::GeneratedImageProps(int circles_num, const sf::Image& original_image, float max_radius, float min_radius)
-    : circles_num(circles_num), max_radius(max_radius), min_radius(min_radius) {
+    : max_circles(circles_num), max_radius(max_radius), min_radius(min_radius) {
     const auto original_image_size = original_image.getSize();
     width = original_image_size.x;
     height = original_image_size.y;

@@ -144,8 +144,8 @@ private:
             auto& name = entry.first;
             auto& value = entry.second;
             std::cout << name << "=" << value << std::endl;
-            if (name == "circles_num")
-                image_props.circles_num = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+            if (name == "max_circles")
+                image_props.max_circles = getConfigValue<int>(entry, ConfigValueType::INTEGER);
             else if (name == "sigma_evaluation_frequency")
                 image_generator_config.sigma_evaluation_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
             else if (name == "next_circle_frequency")

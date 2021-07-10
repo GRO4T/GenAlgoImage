@@ -9,12 +9,12 @@ void ImageGenerator::nextGeneration() {
     state.nextGeneration();
     if (state.nextCircle()) {
         state.current_circle_progress = 0;
-        state.current_circle = (state.current_circle + 1) % config.image_props.circles_num;
+        state.current_circle = (state.current_circle + 1) % config.image_props.max_circles;
         state.sigma = config.base_sigma;
     }
 
     auto new_generated_image = getGeneratedImage();
-    if (new_generated_image.getCirclesNum() < config.image_props.circles_num &&
+    if (new_generated_image.getCirclesNum() < config.image_props.max_circles &&
         new_generated_image.getCirclesNum() <= state.current_circle)
         new_generated_image.addCircle();
     else
@@ -43,7 +43,8 @@ GeneratedImage& ImageGenerator::getGeneratedImage() { return state.generated_ima
 
 void ImageGenerator::displayLastGenerationInfo() {
     std::cout << "generation: " << state.generation << std::endl;
-    std::cout << " score: " << getGeneratedImage().getFitnessScore() << std::endl;
+    std::cout << "  score: " << getGeneratedImage().getFitnessScore() << std::endl;
+    std::cout << "  current_circle: " << state.current_circle << std::endl;
 }
 
 void ImageGenerator::loadStateFromJSON(const std::string path) {

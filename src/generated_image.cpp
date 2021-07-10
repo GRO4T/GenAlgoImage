@@ -36,6 +36,12 @@ GeneratedImage& GeneratedImage::operator=(const GeneratedImage& other) {
     return *this;
 }
 
+void GeneratedImage::set(int id, const std::vector<CircleProps>& circle_prop_list) {
+    this->id = id;
+    dirty = true;
+    this->circle_prop_list = circle_prop_list;
+}
+
 void GeneratedImage::addCircle() {
     circle_prop_list.push_back(CircleProps(image_props));
     dirty = true;

@@ -12,6 +12,8 @@ public:
     GeneratedImage(const GeneratedImage& other);
     GeneratedImage& operator=(const GeneratedImage& other);
 
+    void set(int id, const std::vector<CircleProps>& circle_prop_list);
+
     std::size_t getCirclesNum() const { return circle_prop_list.size(); }
     void addCircle();
     void evaluate(const sf::Image original_image);

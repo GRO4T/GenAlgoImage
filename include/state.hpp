@@ -3,6 +3,7 @@
 #include "config.hpp"
 
 #include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/istreamwrapper.h>
 #include <rapidjson/writer.h>
 
 #include <fstream>
@@ -76,7 +77,28 @@ struct State {
     }
 
     void loadFromJSON(const std::string& path) {
-
+        using namespace rapidjson;
+        std::ifstream ifs(path);
+        IStreamWrapper isw(ifs);
+        Document document;
+        document.ParseStream(isw);
+        if (!document.IsObject())
+            throw std::runtime_error("Error loading state from JSON. Root should be a JSON Object");
+        generation = document["generation"].GetInt();
+        current_circle = document["current_circle"].GetInt();
+        auto json_generated_image = document["generated_image"].GetObject();
+        int id = json_generated_image["id"].GetInt();
+        std::vector<CircleProps> circle_prop_list;
+        for (const auto& json_circle_prop : json_generated_image["circle_prop_list"].GetArray()) {
+            double radius = json_circle_prop["radius"].GetDouble();
+            auto json_position = json_circle_prop["position"].GetObject();
+            sf::Vector2f position(json_position["x"].GetDouble(), json_position["y"].GetDouble());
+            auto json_color = json_circle_prop["color"].GetObject();
+            sf::Color color(json_color["r"].GetInt(), json_color["g"].GetInt(), json_color["b"].GetInt());
+            circle_prop_list.push_back(CircleProps(radius, position, color, config.image_props));
+        }
+        generated_image.set(id, circle_prop_list);
+        std::cout << "State loaded from " << path << std::endl;
     }
 };
 

@@ -11,7 +11,7 @@ namespace gro4t {
 using RenderTexturePtr = std::unique_ptr<sf::RenderTexture>;
 
 struct GeneratedImageProps {
-    int circles_num;
+    int max_circles;
     float max_radius;
     float min_radius;
     uint32_t width;
@@ -33,6 +33,8 @@ public:
     sf::Color color;
 
     CircleProps(const GeneratedImageProps& image_props);
+    CircleProps(float radius, const sf::Vector2f& position, const sf::Color& color,
+                const GeneratedImageProps& image_props);
     ~CircleProps() {}
 
     void mutate(double sigma);
