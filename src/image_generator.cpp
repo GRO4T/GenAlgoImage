@@ -3,27 +3,30 @@
 namespace gro4t {
 
 ImageGenerator::ImageGenerator(const ImageGeneratorConfig& config)
-    : config(config), state(config), generator(std::random_device{}()), real_dist(0.0, 1.0) {}
+    : config(config), state(config) {}
 
 void ImageGenerator::nextGeneration() {
     state.nextGeneration();
     if (state.nextCircle()) {
         state.current_circle_progress = 0;
         state.current_circle = (state.current_circle + 1) % config.image_props.circles_num;
-        state.sigma = 1.0;
+        state.sigma = config.base_sigma;
     }
+
     auto new_generated_image = getGeneratedImage();
     if (new_generated_image.getCirclesNum() < config.image_props.circles_num &&
         new_generated_image.getCirclesNum() <= state.current_circle)
         new_generated_image.addCircle();
     else
         new_generated_image.mutate(state.current_circle, state.sigma);
+
     new_generated_image.evaluate(config.original_image);
     if (new_generated_image.getFitnessScore() > getGeneratedImage().getFitnessScore()) {
         state.generated_image = new_generated_image;
         state.result_table.push_back(true);
     } else
         state.result_table.push_back(false);
+
     if (--state.last_sigma_evaluation == 0) {
         state.last_sigma_evaluation = config.sigma_evaluation_frequency;
         int successes = std::count(state.result_table.begin(), state.result_table.end(), true);
@@ -31,6 +34,7 @@ void ImageGenerator::nextGeneration() {
         if (success_rate > 0.2) state.sigma = 1.22 * state.sigma;
         if (success_rate < 0.2) state.sigma = 0.82 * state.sigma;
     }
+
     if (state.generation % config.display_info_frequency == 0)
         displayLastGenerationInfo();
 }
@@ -40,6 +44,14 @@ GeneratedImage& ImageGenerator::getGeneratedImage() { return state.generated_ima
 void ImageGenerator::displayLastGenerationInfo() {
     std::cout << "generation: " << state.generation << std::endl;
     std::cout << " score: " << getGeneratedImage().getFitnessScore() << std::endl;
+}
+
+void ImageGenerator::loadStateFromJSON(const std::string path) {
+
+}
+
+void ImageGenerator::saveStateToJSON(const std::string path) {
+
 }
 
 }  // namespace gro4t

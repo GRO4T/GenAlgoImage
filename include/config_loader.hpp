@@ -157,6 +157,8 @@ private:
                 image_props.max_radius = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
             else if (name == "min_radius")
                 image_props.min_radius = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
+            else if (name == "base_sigma")
+                image_generator_config.base_sigma = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
             else if (name == "original_image_path") {
                 auto original_image_path = getConfigValue<std::string>(entry, ConfigValueType::STRING);
                 sf::Image original_image;
