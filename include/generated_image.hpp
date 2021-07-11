@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "utils.hpp"
+#include "circle_props.hpp"
 
 namespace gro4t {
 
