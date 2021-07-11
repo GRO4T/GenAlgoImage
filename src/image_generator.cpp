@@ -30,9 +30,10 @@ void ImageGenerator::nextGeneration() {
     if (--state.last_sigma_evaluation == 0) {
         state.last_sigma_evaluation = config.sigma_evaluation_frequency;
         int successes = std::count(state.result_table.begin(), state.result_table.end(), true);
+        state.result_table.clear();
         double success_rate = successes / (double)config.sigma_evaluation_frequency;
-        if (success_rate > 0.2) state.sigma = 1.22 * state.sigma;
-        if (success_rate < 0.2) state.sigma = 0.82 * state.sigma;
+        if (success_rate < 0.2) state.sigma = 1.22 * state.sigma;
+        if (success_rate > 0.2) state.sigma = 0.82 * state.sigma;
     }
 
     if (state.generation % config.display_info_frequency == 0)
@@ -45,6 +46,10 @@ void ImageGenerator::displayLastGenerationInfo() {
     std::cout << "generation: " << state.generation << std::endl;
     std::cout << "  score: " << getGeneratedImage().getFitnessScore() << std::endl;
     std::cout << "  current_circle: " << state.current_circle << std::endl;
+    std::cout << "  sigma: " << state.sigma << std::endl;
+//    int successes = std::count(state.result_table.begin(), state.result_table.end(), true);
+//    int tries = state.result_table.size();
+//    std::cout << "  success_rate: " << (tries > 0 ? successes / (double) tries : 0.0) << std::endl;
 }
 
 void ImageGenerator::loadStateFromJSON(const std::string path) {
