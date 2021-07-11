@@ -26,6 +26,9 @@ private:
     ImageGeneratorConfig config;
 
     void displayLastGenerationInfo();
+    void nextCircleIfImprovementNotSatisfactory();
+    void mutateAndEvaluate();
+    void evaluateSigma();
 };
 
 }  // namespace gro4t

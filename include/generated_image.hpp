@@ -43,10 +43,6 @@ private:
     GeneratedImageProps image_props;
 
     void generateRenderTexture();
-    void mutateLayer(double sigma);
-    void mutatePosition(double sigma);
-    void mutateColor(double sigma);
-    void mutateRadius(double sigma);
 };
 
 }  // namespace gro4t

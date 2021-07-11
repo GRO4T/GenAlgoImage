@@ -67,44 +67,6 @@ void GeneratedImage::evaluate(const sf::Image original_image) {
 void GeneratedImage::mutate(int circle_index, double sigma) {
     clear();
     circle_prop_list.at(circle_index).mutate(sigma);
-
-//    auto r = normal_dist(generator);
-//    if (std::abs(r) < 0.7) {
-//        auto prop_number = uniform_int_dist(generator) % 3;
-//        switch (prop_number) {
-//            case 0:
-//                mutateColor(sigma);
-//                break;
-//            case 1:
-//                mutatePosition(sigma);
-//                break;
-//            case 2:
-//                mutateRadius(sigma);
-//                break;
-//        }
-//    }
-//    if (std::abs(r) < 1.0) {
-//        auto pair_number = uniform_int_dist(generator) % 3;
-//        switch (pair_number) {
-//            case 0:
-//                mutateColor(sigma);
-//                mutatePosition(sigma);
-//                break;
-//            case 1:
-//                mutateColor(sigma);
-//                mutateRadius(sigma);
-//                break;
-//            case 2:
-//                mutatePosition(sigma);
-//                mutateRadius(sigma);
-//                break;
-//        }
-//    }
-//    else {
-//        mutateColor(sigma);
-//        mutatePosition(sigma);
-//        mutateRadius(sigma);
-//    }
 }
 
 void GeneratedImage::clear() {
@@ -143,21 +105,6 @@ const sf::RenderTexture& GeneratedImage::getRenderTexture() {
     if (dirty) generateRenderTexture();
     dirty = false;
     return *render_texture;
-}
-void GeneratedImage::mutateLayer(double sigma) {
-    std::cout << "mutate layer" << std::endl;
-}
-
-void GeneratedImage::mutatePosition(double sigma) {
-    std::cout << "mutate position" << std::endl;
-}
-
-void GeneratedImage::mutateColor(double sigma) {
-    std::cout << "mutate color" << std::endl;
-}
-
-void GeneratedImage::mutateRadius(double sigma) {
-    std::cout << "mutate radius" << std::endl;
 }
 
 }  // namespace gro4t

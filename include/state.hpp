@@ -18,6 +18,7 @@ struct State {
           generation(0),
           current_circle_progress(0),
           current_circle(0),
+          saved_fitness(0),
           generated_image(config.image_props),
           last_sigma_evaluation(config.sigma_evaluation_frequency),
           sigma(config.base_sigma) {}
@@ -26,6 +27,7 @@ struct State {
     int current_circle;
     ImageGeneratorConfig config;
     double sigma;
+    double saved_fitness;
     std::vector<bool> result_table;
     int last_sigma_evaluation;
     GeneratedImage generated_image;
