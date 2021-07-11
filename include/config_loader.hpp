@@ -137,27 +137,34 @@ private:
     }
 
     static ImageGeneratorConfig createImageGeneratorConfig(
-        std::map<std::string, ConfigValue>& config) {
+            std::map<std::string, ConfigValue>& config) {
+
+        auto getDecimal = [](const ConfigEntry & entry) { return getConfigValue<double>(entry, ConfigValueType::DECIMAL); };
+        auto getInteger = [](const ConfigEntry & entry) { return getConfigValue<int>(entry, ConfigValueType::INTEGER); };
+
         GeneratedImageProps image_props;
         ImageGeneratorConfig image_generator_config;
+
         for (const auto& entry : config) {
             auto& name = entry.first;
             auto& value = entry.second;
             std::cout << name << "=" << value << std::endl;
             if (name == "max_circles")
-                image_props.max_circles = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+                image_props.max_circles = getInteger(entry);
             else if (name == "sigma_evaluation_frequency")
-                image_generator_config.sigma_evaluation_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+                image_generator_config.sigma_evaluation_frequency = getInteger(entry);
             else if (name == "next_circle_frequency")
-                image_generator_config.next_circle_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+                image_generator_config.next_circle_frequency = getInteger(entry);
             else if (name == "display_info_frequency")
-                image_generator_config.display_info_frequency = getConfigValue<int>(entry, ConfigValueType::INTEGER);
+                image_generator_config.display_info_frequency = getInteger(entry);
             else if (name == "max_radius")
-                image_props.max_radius = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
+                image_props.max_radius = getDecimal(entry);
             else if (name == "min_radius")
-                image_props.min_radius = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
+                image_props.min_radius = getDecimal(entry);
+            else if (name == "expected_improvement")
+                image_generator_config.expected_improvement = getDecimal(entry);
             else if (name == "base_sigma")
-                image_generator_config.base_sigma = getConfigValue<double>(entry, ConfigValueType::DECIMAL);
+                image_generator_config.base_sigma = getDecimal(entry);
             else if (name == "original_image_path") {
                 auto original_image_path = getConfigValue<std::string>(entry, ConfigValueType::STRING);
                 sf::Image original_image;

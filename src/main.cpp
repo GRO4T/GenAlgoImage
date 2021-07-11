@@ -26,7 +26,7 @@ int main(int argc, char ** argv) {
         image_generator.loadStateFromJSON(input_file);
     initial_generation = image_generator.getGeneration();
 
-    sf::RenderWindow window(sf::VideoMode(512, 512), "Genetic Image");
+    sf::RenderWindow window(sf::VideoMode(image_generator.getImageWidth(), image_generator.getImageHeight()), "Genetic Image");
     sf::Sprite displayedSprite;
     while (window.isOpen())
     {

@@ -16,8 +16,12 @@ public:
     ~ImageGenerator() {}
 
     void nextGeneration();
+
     GeneratedImage& getGeneratedImage();
     int getGeneration() const { return state.generation; }
+    int getImageWidth() const { return state.config.image_props.width; }
+    int getImageHeight() const { return state.config.image_props.height; }
+
     void loadStateFromJSON(const std::string path);
     void saveStateToJSON(const std::string path);
 

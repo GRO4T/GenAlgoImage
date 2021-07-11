@@ -9,7 +9,7 @@ struct ImageGeneratorConfig {
     GeneratedImageProps image_props;
     sf::Image original_image;
     double base_sigma;
-    double expected_improvement = 0.0001;
+    double expected_improvement;
 };
 
 }
