@@ -1,100 +1,97 @@
-#include "genetic_algorithm/genetic_algorithm.h"
 
-#include <SFML/Graphics.hpp>
-#include <thread>
-#include <atomic>
+#include <unistd.h>
+
 #include <iostream>
-#include <cstddef>
+#include <memory>
+#include <stdexcept>
 
-using gen_algo_image::Bitmap;
-using gen_algo_image::BitmapLoader;
-using gen_algo_image::SFML_ImageWrapper;
-using gen_algo_image::SFMLImageLoader;
-using gen_algo_image::GeneticAlgorithm;
-using gen_algo_image::Individual;
-using gen_algo_image::Color;
-using gen_algo_image::Square;
-using gen_algo_image::Circle;
-using gen_algo_image::Timer;
-using gen_algo_image::ArashPartowBitmapWrapper;
+#include "image_generator.hpp"
+#include "config_loader.hpp"
 
-std::atomic<bool> ready = false;
-std::atomic<bool> windowOpen = true;
-sf::Image img;
+using namespace gro4t;
 
-template<class ImageType>
-void RunGeneticAlgorithm(ImageType* original, unsigned popSize,
-                         unsigned numSquares, unsigned numCircles);
-void Display();
+std::string input_file;
+std::string output_file;
+int generations_to_simulate = -1;
+int initial_generation;
 
-int main() {
-    srand (time(NULL));
+bool parseArgs(int argc, char ** argv);
+void checkAppShouldClose(sf::RenderWindow& window, ImageGenerator& image_generator);
 
-    std::string bmpFilename = "../res/lena.bmp";
-    std::string sfmlImageFilename = "../res/lena.png";
+int main(int argc, char ** argv) {
+    if (!parseArgs(argc, argv)) return 1;
 
-    SFML_ImageWrapper original2;
-    SFMLImageLoader loader2;
-    loader2.Load(original2, sfmlImageFilename);
+    ImageGenerator image_generator(ConfigLoader::loadConfig("res/image_generator.conf"));
+    if (input_file != "")
+        image_generator.loadStateFromJSON(input_file);
+    initial_generation = image_generator.getGeneration();
 
-    BitmapLoader loader;
-    Bitmap original;
-    loader.Load(original, bmpFilename);
-
-    ArashPartowBitmapWrapper original3;
-    original3.Load(bmpFilename);
-
-    std::thread first(RunGeneticAlgorithm<ArashPartowBitmapWrapper>, &original3, 50, 0, 50);
-    Display();
-    first.join();
-
+    sf::RenderWindow window(sf::VideoMode(image_generator.getImageWidth(), image_generator.getImageHeight()), "Genetic Image");
+    sf::Sprite displayedSprite;
+    while (window.isOpen())
+    {
+        checkAppShouldClose(window, image_generator);
+        displayedSprite.setTexture(image_generator.getGeneratedImage().getTexture());
+        window.clear(sf::Color::Black);
+        window.draw(displayedSprite);
+        window.display();
+        image_generator.nextGeneration();
+    }
     return 0;
 }
 
-void Display(){
-    sf::Texture text;
-    sf::Sprite sprite;
-
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ");
-    window.setFramerateLimit(30);
-
-    while (window.isOpen()){
-        if (ready){
-            text.loadFromImage(img);
-            sprite.setTexture(text);
-            ready = false;
+bool parseArgs(int argc, char ** argv) {
+    std::string usage = "Usage: ./genetic_image [-h] [-i filename] [-o filename] [-n number]\n"
+                        "-h help\n"
+                        "-i path to JSON file with initial state\n"
+                        "-o path where final state will be saved\n"
+                        "-n number of generations to simulate\n";
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = std::string(argv[i]);
+        if (arg == "-h") {
+            std::cout << usage;
+            return false;
         }
-        window.clear();
-        window.draw(sprite);
-        window.display();
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed){
-                window.close();
-                windowOpen = false;
+        else if (arg == "-i" || arg == "-o" || arg == "-n") {
+            if (++i < argc) {
+                // first character of neither a filename nor a number cannot be '-'
+                if (*argv[i] == '-') {
+                    std::cout << usage;
+                    return false;
+                }
+                if (arg == "-i")
+                    input_file = std::string(argv[i]);
+                else if (arg == "-o")
+                    output_file = std::string(argv[i]);
+                else
+                    generations_to_simulate = std::stoi(argv[i]);
+            }
+            else {
+                std::cout << usage;
+                return false;
             }
         }
     }
+    return true;
 }
 
-template<class ImageType>
-void RunGeneticAlgorithm(ImageType* original, unsigned popSize,
-                         unsigned numSquares, unsigned numCircles){
-    GeneticAlgorithm<ImageType> geneticAlgorithm(numSquares,  numCircles, original);
-    Individual<ImageType> best;
+bool stopSimulation(const ImageGenerator& image_generator) {
+    if (generations_to_simulate == -1) return false;
+    return initial_generation + generations_to_simulate <= image_generator.getGeneration();
+}
 
-    geneticAlgorithm.CreatePopulation();
+void closeApp(sf::RenderWindow& window, ImageGenerator& image_generator) {
+    if (output_file != "")
+        image_generator.saveStateToJSON(output_file);
+    window.close();
+}
 
-    for (int i = 0; i < 20; i++){
-        geneticAlgorithm.NextGeneration();
-        best = geneticAlgorithm.GetBestIndividual();
-        best.LoadResultToSFImage(img);
-        ready = true;
-
-        while (ready){
-            if (!windowOpen) return;
-        }
+void checkAppShouldClose(sf::RenderWindow& window, ImageGenerator& image_generator) {
+    if (stopSimulation(image_generator))
+        closeApp(window, image_generator);
+    sf::Event event;
+    while (window.pollEvent(event)) {
+        if (event.type == sf::Event::Closed)
+            closeApp(window, image_generator);
     }
 }
