@@ -15,10 +15,14 @@ Mainly because it uses crossover, which is hard to define for images, and has st
 I've decided that (1+1) evolution strategy would yield better results.
 
 ## Results
+### After 30min
+![](res/results_30min.png)
 
 ## Final thoughts
 Generally I'm quite satisfied with the results. Even though, at first I planned to use multithreading
 I ultimately didn't do it. I felt that because algorithm only operates on single individual
 it would be hard to parallelize (I would have to parallelize image evaluation).
 If I were to use multithreading, I would probably move to (mi + lambda) evolution strategy.
+
+
 
