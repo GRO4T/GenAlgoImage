@@ -2,8 +2,9 @@
 
 #include <cassert>
 
-#include "utils.hpp"
+#include "cached_image.hpp"
 #include "circle_props.hpp"
+#include "utils.hpp"
 
 namespace gro4t {
 
@@ -17,7 +18,7 @@ public:
 
     std::size_t getCirclesNum() const { return circle_prop_list.size(); }
     void addCircle();
-    void evaluate(const sf::Image original_image);
+    void evaluate(const CachedImage& original_image);
     void mutate(int circle_index, double sigma);
     void clear();
 

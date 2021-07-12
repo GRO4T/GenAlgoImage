@@ -52,7 +52,7 @@ void ImageGenerator::mutateAndEvaluate() {
     else
         new_generated_image.mutate(state.current_circle, state.sigma);
 
-    new_generated_image.evaluate(config.original_image);
+    new_generated_image.evaluate(config.getOriginalImage());
     if (new_generated_image.getFitnessScore() > getGeneratedImage().getFitnessScore()) {
         state.generated_image = new_generated_image;
         state.result_table.push_back(true);

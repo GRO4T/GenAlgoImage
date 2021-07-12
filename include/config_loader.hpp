@@ -173,7 +173,7 @@ private:
                 auto original_image_size = original_image.getSize();
                 image_props.width = original_image_size.x;
                 image_props.height = original_image_size.y;
-                image_generator_config.original_image = original_image;
+                image_generator_config.setOriginalImage(original_image);
             }
         }
         image_generator_config.image_props = image_props;

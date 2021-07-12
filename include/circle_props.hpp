@@ -24,7 +24,6 @@ public:
     void mutate(double sigma);
 
 private:
-    static const int int_dist_range = 1000;
     static std::mt19937 generator;
     static std::uniform_int_distribution<int> uniform_int_dist;
     static std::uniform_real_distribution<double> uniform_real_dist;

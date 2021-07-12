@@ -3,7 +3,7 @@
 namespace gro4t {
 
 std::mt19937 CircleProps::generator(std::random_device{}());
-std::uniform_int_distribution<int> CircleProps::uniform_int_dist(0, int_dist_range);
+std::uniform_int_distribution<int> CircleProps::uniform_int_dist(0, 1000);
 std::uniform_real_distribution<double> CircleProps::uniform_real_dist(0.0, 1.0);
 std::normal_distribution<double> CircleProps::normal_real_dist(0.0, 1.0);
 

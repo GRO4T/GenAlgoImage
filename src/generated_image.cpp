@@ -47,17 +47,18 @@ void GeneratedImage::addCircle() {
     dirty = true;
 }
 
-void GeneratedImage::evaluate(const sf::Image original_image) {
+void GeneratedImage::evaluate(const CachedImage& original_image) {
     if (!dirty) return;
     const auto original_image_size = original_image.getSize();
     const auto generated_image_size = getImage().getSize();
     if (original_image_size != generated_image_size)
         throw std::runtime_error("Generated image size should be the same as original");
     double score = 0.0;
+    const auto& generated_image = getImage();
     for (int x = 0; x < original_image_size.x; ++x) {
         for (int y = 0; y < original_image_size.y; ++y) {
             const auto original_pixel = original_image.getPixel(x, y);
-            const auto generated_pixel = getImage().getPixel(x, y);
+            const auto generated_pixel = generated_image.getPixel(x, y);
             score += calculatePartialMatchPoints(distance(original_pixel, generated_pixel));
         }
     }
