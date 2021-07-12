@@ -13,7 +13,7 @@ GeneratedImageProps::GeneratedImageProps(int circles_num, const sf::Image& origi
 }
 
 sf::Color distance(const sf::Color& color_a, const sf::Color& color_b) {
-    auto color_distance = [](uint8_t a, uint8_t b) {
+    static const auto color_distance = [](uint8_t a, uint8_t b) {
         return (uint8_t) std::abs(a - b);
     };
     const auto diff_r = color_distance(color_a.r, color_b.r);

@@ -3,6 +3,9 @@ project(genetic-image)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_FLAGS_RELEASE -O3)
+
 if (UNIX)
     find_package(SFML 2.5 COMPONENTS graphics)
     include_directories(include)
